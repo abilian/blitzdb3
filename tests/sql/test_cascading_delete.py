@@ -10,6 +10,7 @@ from ..conftest import _sql_backend, get_sql_engine
 
 
 class DirectorAward(Document):
+
     class Meta(Document.Meta):
         autoregister = False
 
@@ -19,6 +20,7 @@ class DirectorAward(Document):
 
 
 class Actor(Document):
+
     class Meta(Document.Meta):
         autoregister = False
 
@@ -26,6 +28,7 @@ class Actor(Document):
 
 
 class Movie(Document):
+
     class Meta(Document.Meta):
         autoregister = False
 
@@ -35,6 +38,7 @@ class Movie(Document):
 
 
 class Director(Document):
+
     class Meta(Document.Meta):
         autoregister = False
 
@@ -51,7 +55,9 @@ def _init_backend(backend):
 
     ted_kotcheff = Director({'name': 'Ted Kotcheff'})
     silvester_stallone = Actor({'name': 'Silvester Stallone'})
-    rambo = Movie({'name': 'Rambo I', 'actors': [silvester_stallone], 'director': ted_kotcheff})
+    rambo = Movie(
+        {'name': 'Rambo I', 'actors': [silvester_stallone], 'director': ted_kotcheff}
+    )
     oscar = DirectorAward({'name': 'Oscar', 'director': ted_kotcheff})
 
     with backend.transaction():
@@ -62,7 +68,9 @@ def _init_backend(backend):
 @pytest.fixture
 def cascade_backend(request):
     engine = get_sql_engine()
-    backend = _sql_backend(request, engine, autodiscover_classes=False, ondelete='CASCADE')
+    backend = _sql_backend(
+        request, engine, autodiscover_classes=False, ondelete='CASCADE'
+    )
     _init_backend(backend)
     return backend
 

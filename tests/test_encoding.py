@@ -6,12 +6,12 @@ from .helpers.movie_data import Actor
 
 def test_delete(backend):
 
-    stallone = Actor({'name' : u'ßílvöster Ställöne'})
-    arnie = Actor({'name' : u'Arnöld Schwürzenöggär'})
+    stallone = Actor({'name': u'ßílvöster Ställöne'})
+    arnie = Actor({'name': u'Arnöld Schwürzenöggär'})
 
     backend.save(stallone)
     backend.save(arnie)
     backend.commit()
 
-    assert backend.get(Actor,{'name' : stallone.name}) == stallone
-    assert backend.get(Actor,{'name' : arnie.name}) == arnie
+    assert backend.get(Actor, {'name': stallone.name}) == stallone
+    assert backend.get(Actor, {'name': arnie.name}) == arnie

@@ -12,11 +12,13 @@ def test_basic_exceptions():
 
     try:
         raise Actor.DoesNotExist
+
     except Actor.DoesNotExist:
         pass
 
     try:
         raise Actor.MultipleDocumentsReturned
+
     except Actor.MultipleDocumentsReturned:
         pass
 
@@ -29,11 +31,13 @@ def test_exception_distinguishability():
     with pytest.raises(Actor.DoesNotExist):
         try:
             raise Actor.DoesNotExist
+
         except Director.DoesNotExist:
             pass
 
     with pytest.raises(Actor.MultipleDocumentsReturned):
         try:
             raise Actor.MultipleDocumentsReturned
+
         except Director.MultipleDocumentsReturned:
             pass

@@ -15,17 +15,22 @@ logger = logging.getLogger(__name__)
 if six.PY3:
     unicode = str
 
+
 class DoesNotExist(BaseException):
 
     def __str__(self):
         message = BaseException.__str__(self)
         return u"DoesNotExist({}): {}".format(self.__class__.__name__, message)
 
+
 class MultipleDocumentsReturned(BaseException):
 
     def __str__(self):
         message = BaseException.__str__(self)
-        return u"MultipleDocumentsReturned({}): {}".format(self.__class__.__name__, message)
+        return u"MultipleDocumentsReturned({}): {}".format(
+            self.__class__.__name__, message
+        )
+
 
 class MetaDocument(type):
 
@@ -41,22 +46,22 @@ class MetaDocument(type):
 
         fields = {}
 
-        #we inherit the fields from the base type(s)
-        if hasattr(class_type,'fields'):
+        # we inherit the fields from the base type(s)
+        if hasattr(class_type, 'fields'):
             fields.update(class_type.fields)
 
-        for key,value in dct.items():
-            if isinstance(value,BaseField):
+        for key, value in dct.items():
+            if isinstance(value, BaseField):
                 if value.key:
                     field_key = value.key
                 else:
                     field_key = key
                 fields[field_key] = value
-                delattr(class_type,key)
+                delattr(class_type, key)
 
         class_type.fields = fields
 
-        global DoesNotExist,MultipleDocumentsReturned
+        global DoesNotExist, MultipleDocumentsReturned
 
         class DoesNotExist(DoesNotExist):
             pass
@@ -71,12 +76,17 @@ class MetaDocument(type):
             document_classes.remove(class_type)
         if name == 'Document' and bases == (object,):
             pass
-        elif not (hasattr(class_type.Meta,'autoregister') and class_type.Meta.autoregister == False):
+        elif not (
+            hasattr(class_type.Meta, 'autoregister')
+            and class_type.Meta.autoregister == False
+        ):
             document_classes.append(class_type)
 
         return class_type
 
+
 document_classes = []
+
 
 @six.add_metaclass(MetaDocument)
 class Document(object):
@@ -139,11 +149,13 @@ class Document(object):
 
     class Meta:
 
-        PkType = CharField(length = 32,primary_key = True,indexed = True,nullable = False)
+        PkType = CharField(length=32, primary_key=True, indexed=True, nullable=False)
         primary_key = "pk"
         indexes = {}
 
-    def __init__(self, attributes=None, lazy=False, backend=None, autoload=True, db_loader = None):
+    def __init__(
+        self, attributes=None, lazy=False, backend=None, autoload=True, db_loader=None
+    ):
         """
         Initializes a document instance with the given attributes. If `lazy = True`, a *lazy*
         document will be created, which means that the attributes of the document will be loaded
@@ -176,14 +188,15 @@ class Document(object):
         self._embed = False
         self.initialize()
 
-    def __getitem__(self,key):
+    def __getitem__(self, key):
         try:
-            lazy = super(Document,self).__getattribute__('_lazy')
+            lazy = super(Document, self).__getattribute__('_lazy')
         except AttributeError:
             lazy = False
         if lazy:
             if key in self.lazy_attributes:
                 return self.lazy_attributes[key]
+
             self.revert(implicit=True)
         return self.attributes[key]
 
@@ -192,7 +205,7 @@ class Document(object):
         return self._lazy
 
     @lazy.setter
-    def lazy(self,lazy):
+    def lazy(self, lazy):
         self._lazy = lazy
 
     @property
@@ -206,13 +219,13 @@ class Document(object):
         return self._attributes
 
     @attributes.setter
-    def attributes(self,value):
+    def attributes(self, value):
         self._attributes = value
 
-    def get(self,key,default = None):
+    def get(self, key, default=None):
         return self[key] if key in self else default
 
-    def has_key(self,key):
+    def has_key(self, key):
         return True if key in self else False
 
     def keys(self):
@@ -232,46 +245,53 @@ class Document(object):
         return self._properties
 
     @properties.setter
-    def properties(self,value):
+    def properties(self, value):
         self._properties = value
 
     def __contains__(self, key):
-        return True if (key in self.lazy_attributes or key in self.attributes) else False
+        return True if (
+            key in self.lazy_attributes or key in self.attributes
+        ) else False
 
     def __iter__(self):
         for key in self.keys():
             yield key
 
-    def get_lazy_attribute(self,key):
-        #we make sure not to revert the document...
-        return object.__getattribute__(self,key)
+    def get_lazy_attribute(self, key):
+        # we make sure not to revert the document...
+        return object.__getattribute__(self, key)
 
-    def __getattr__(self, key,load_if_lazy = True):
-
+    def __getattr__(self, key, load_if_lazy=True):
         try:
-            return super(Document,self).__getattr__(key)
+            return super(Document, self).__getattr__(key)
+
         except AttributeError:
             pass
         try:
             if key in self._properties:
                 return self._properties[key]
+
             if key in self._attributes:
                 return self._attributes[key]
+
             if self._lazy:
                 self.revert(implicit=True)
             return self._attributes[key]
+
         except KeyError:
             raise AttributeError(key)
 
     def __setattr__(self, key, value):
-        if key.startswith('_') or key in ('attributes','pk','lazy','backend'):
+        if key.startswith('_') or key in ('attributes', 'pk', 'lazy', 'backend'):
             return super(Document, self).__setattr__(key, value)
+
         else:
             self.attributes[key] = value
 
     def __delattr__(self, key):
         if key.startswith('_'):
             return super(Document, self).__delattr__(key)
+
         try:
             del self.attributes[key]
         except KeyError:
@@ -282,17 +302,20 @@ class Document(object):
     def __delitem__(self, key):
         try:
             return self.__delattr__(key)
+
         except AttributeError:
             raise KeyError(key)
 
     def __copy__(self):
-        d = self.__class__(self.attributes.copy(), lazy=self._lazy, backend = self._backend)
+        d = self.__class__(
+            self.attributes.copy(), lazy=self._lazy, backend=self._backend
+        )
         return d
 
     def __deepcopy__(self, memo):
-        d = self.__class__(copy.deepcopy(self.attributes, memo),
-                           lazy=self._lazy,
-                           backend =self._backend)
+        d = self.__class__(
+            copy.deepcopy(self.attributes, memo), lazy=self._lazy, backend=self._backend
+        )
         return d
 
     def __hash__(self):
@@ -304,6 +327,7 @@ class Document(object):
     def __nonzero__(self):
         if self.pk:
             return True
+
         return False
 
     def __eq__(self, other):
@@ -318,21 +342,28 @@ class Document(object):
         """
         if id(self) == id(other):
             return True
+
         if type(self) != type(other):
             return False
+
         if self.pk != None or other.pk != None:
             if self.pk == other.pk:
                 return True
+
         if self.attributes == other.attributes:
             return True
+
         return False
 
     def __unicode__(self):
-        return self.__class__.__name__ + "({{{0} : '{1}'}},lazy = {2})".format(self.get_pk_name(), self.pk, self._lazy)
+        return self.__class__.__name__ + "({{{0} : '{1}'}},lazy = {2})".format(
+            self.get_pk_name(), self.pk, self._lazy
+        )
 
     if six.PY3:
         __str__ = __unicode__
     else:
+
         def __str__(self):
             return unicode(self).encode("utf-8")
 
@@ -346,14 +377,19 @@ class Document(object):
             if isinstance(d, dict):
                 out = {}
                 return {key: truncate_dict(value, n - 1) for key, value in d.items()}
+
             elif isinstance(d, list) or isinstance(d, set):
                 return [truncate_dict(v, n - 1) for v in d]
+
             elif isinstance(d, Document):
                 return d._represent(n - 1)
+
             else:
                 return d
 
-        return self.__class__.__name__ + "(" + str(truncate_dict(self._attributes)) + ")"
+        return self.__class__.__name__ + "(" + str(
+            truncate_dict(self._attributes)
+        ) + ")"
 
     __repr__ = _represent
 
@@ -387,7 +423,9 @@ class Document(object):
 
     @classmethod
     def get_pk_name(cls):
-        return cls.Meta.primary_key if hasattr(cls.Meta, 'primary_key') else Document.Meta.primary_key
+        return cls.Meta.primary_key if hasattr(
+            cls.Meta, 'primary_key'
+        ) else Document.Meta.primary_key
 
     @property
     def pk(self):
@@ -411,7 +449,7 @@ class Document(object):
         if primary_key in self._attributes:
             return self._attributes[primary_key]
 
-        #if there is no pk value but a _db_loader, we load the object lazily to retrieve the pk
+        # if there is no pk value but a _db_loader, we load the object lazily to retrieve the pk
         if self._lazy and self._db_loader:
             self.revert(implicit=True)
             if primary_key in self._attributes:
@@ -436,7 +474,7 @@ class Document(object):
         return self._backend
 
     @backend.setter
-    def backend(self,backend):
+    def backend(self, backend):
         self._backend = backend
 
     def save(self, backend=None):
@@ -451,7 +489,9 @@ class Document(object):
         if not backend:
             if not self._backend:
                 raise AttributeError("No default backend defined!")
+
             return self._backend.save(self)
+
         self._backend = backend
         return backend.save(self)
 
@@ -467,7 +507,9 @@ class Document(object):
         if not backend:
             if not self._backend:
                 raise AttributeError("No default backend defined!")
+
             return self._backend.delete(self)
+
         backend.delete(self)
 
     def revert(self, backend=None, implicit=False):
@@ -487,18 +529,26 @@ class Document(object):
 
         """
         if implicit and not self._autoload:
-            logger.debug("Autoloading is disabled, not reverting the document implicitly...")
+            logger.debug(
+                "Autoloading is disabled, not reverting the document implicitly..."
+            )
             return
+
         self._lazy = False
-        logger.debug("Reverting to database state (%s, %s)" % (self.__class__.__name__, str(self.pk)))
+        logger.debug(
+            "Reverting to database state (%s, %s)" %
+            (self.__class__.__name__, str(self.pk))
+        )
         if self._db_loader:
             obj = self._db_loader()
         else:
             backend = backend or self._backend
             if not backend:
                 raise AttributeError("No backend given!")
+
             if self.pk is None:
                 return
+
             obj = backend.get(self.__class__, {self.get_pk_name(): self.pk})
         self._attributes = obj.attributes
         self.initialize()

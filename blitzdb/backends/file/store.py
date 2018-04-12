@@ -41,12 +41,14 @@ class Store(object):
         try:
             with open(self._get_path_for_key(key), "rb") as input_file:
                 return input_file.read()
+
         except IOError:
             raise KeyError("Key {} not found!".format(key))
 
     def has_blob(self, key):
         if os.path.exists(self._get_path_for_key(key)):
             return True
+
         return False
 
     def begin(self):
@@ -88,22 +90,30 @@ class TransactionalStore(Store):
     def has_blob(self, key):
         if not self._enabled:
             return super(TransactionalStore, self).has_blob(key)
+
         if key in self._delete_cache:
             return False
+
         if key in self._update_cache:
             return True
+
         return super(TransactionalStore, self).has_blob(key)
 
     def get_blob(self, key):
         if not self._enabled:
             return super(TransactionalStore, self).get_blob(key)
+
         if key in self._update_cache:
             return self._update_cache[key]
+
         return super(TransactionalStore, self).get_blob(key)
 
     def store_blob(self, blob, key, *args, **kwargs):
         if not self._enabled:
-            return super(TransactionalStore, self).store_blob(blob, key, *args, **kwargs)
+            return super(TransactionalStore, self).store_blob(
+                blob, key, *args, **kwargs
+            )
+
         if key in self._delete_cache:
             self._delete_cache.remove(key)
         self._update_cache[key] = copy.copy(blob)
@@ -112,8 +122,10 @@ class TransactionalStore(Store):
     def delete_blob(self, key, *args, **kwargs):
         if not self._enabled:
             return super(TransactionalStore, self).delete_blob(key, *args, **kwargs)
+
         if not self.has_blob(key):
             raise KeyError("Key %s not found!" % key)
+
         self._delete_cache.add(key)
         if key in self._update_cache:
             del self._update_cache[key]

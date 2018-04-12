@@ -15,13 +15,13 @@ class Actor(Document):
     class Meta(Document.Meta):
         autoregister = False
 
-    created_at = DateTimeField(auto_now_add = True,indexed = True)
+    created_at = DateTimeField(auto_now_add=True, indexed=True)
 
 
 @pytest.fixture
 def backend():
     engine = create_engine('sqlite:///:memory:', echo=True)
-    backend = Backend(engine = engine,autodiscover_classes = False)
+    backend = Backend(engine=engine, autodiscover_classes=False)
     backend.register(Actor)
     backend.init_schema()
     backend.create_schema()
@@ -29,11 +29,11 @@ def backend():
 
 
 def test_basics(backend):
-    actor = Actor({'created_at' : datetime.datetime.now()})
+    actor = Actor({'created_at': datetime.datetime.now()})
 
     backend.save(actor)
     backend.commit()
 
-    recovered_actor = backend.get(Actor,{})
-#    assert isinstance(recovered_actor.created_at,datetime.datetime)
+    recovered_actor = backend.get(Actor, {})
+    #    assert isinstance(recovered_actor.created_at,datetime.datetime)
     assert recovered_actor.created_at == actor.created_at

@@ -104,21 +104,17 @@ try:
 
         return backend
 
-
     @pytest.fixture
     def sql_backend(request):
         backend = _sql_backend(request, engine)
 
         return backend
 
-
     test_sql = True
-
 
     @pytest.fixture
     def small_sql_test_data(request, sql_backend):
         return generate_test_data(request, sql_backend, 20)
-
 
     print("Testing with SQL")
 except ImportError:
@@ -126,16 +122,22 @@ except ImportError:
     test_sql = False
 
 
-@pytest.fixture(scope="function", params=["file_json", "file_pickle"]
-                                         + (["mongo"] if test_mongo else [])
-                                         + (["sql"] if test_sql else []))
+@pytest.fixture(
+    scope="function",
+    params=["file_json", "file_pickle"] +
+    (["mongo"] if test_mongo else []) +
+    (["sql"] if test_sql else []),
+)
 def backend(request, temporary_path):
     return _backend(request, temporary_path)
 
 
-@pytest.fixture(scope="function", params=["file_json", "file_pickle"]
-                                         + (["mongo"] if test_mongo else [])
-                                         + (["sql"] if test_sql else []))
+@pytest.fixture(
+    scope="function",
+    params=["file_json", "file_pickle"] +
+    (["mongo"] if test_mongo else []) +
+    (["sql"] if test_sql else []),
+)
 def no_autoload_backend(request, temporary_path):
     return _backend(request, temporary_path, autoload_embedded=False)
 
@@ -145,9 +147,12 @@ def no_autoload_mongodb_backend(request, temporary_path):
     return _backend(request, temporary_path, autoload_embedded=False)
 
 
-@pytest.fixture(scope="function", params=["file_json", "file_pickle"]
-                                         + (["mongo"] if test_mongo else [])
-                                         + (["sql"] if test_sql else []))
+@pytest.fixture(
+    scope="function",
+    params=["file_json", "file_pickle"] +
+    (["mongo"] if test_mongo else []) +
+    (["sql"] if test_sql else []),
+)
 def transactional_backend(request, temporary_path):
     return _backend(request, temporary_path)
 
@@ -177,13 +182,24 @@ def _backend(request, temporary_path, autoload_embedded=True):
     We test all query operations on a variety of backends.
     """
     if request.param == 'file_json':
-        return _file_backend(request, temporary_path, {'serializer_class': 'json'},
-                             autoload_embedded=autoload_embedded)
+        return _file_backend(
+            request,
+            temporary_path,
+            {'serializer_class': 'json'},
+            autoload_embedded=autoload_embedded,
+        )
+
     elif request.param == 'file_pickle':
-        return _file_backend(request, temporary_path, {'serializer_class': 'pickle'},
-                             autoload_embedded=autoload_embedded)
+        return _file_backend(
+            request,
+            temporary_path,
+            {'serializer_class': 'pickle'},
+            autoload_embedded=autoload_embedded,
+        )
+
     elif request.param == 'mongo':
         return _mongodb_backend(request, {}, autoload_embedded=autoload_embedded)
+
     elif request.param == 'sql':
         return _sql_backend(request, engine)
 
@@ -197,9 +213,12 @@ def _init_indexes(backend):
 
 
 def _file_backend(request, temporary_path, config, autoload_embedded=True):
-    backend = FileBackend(path=temporary_path, config=config,
-                          overwrite_config=True,
-                          autoload_embedded=autoload_embedded)
+    backend = FileBackend(
+        path=temporary_path,
+        config=config,
+        overwrite_config=True,
+        autoload_embedded=autoload_embedded,
+    )
     _init_indexes(backend)
     return backend
 

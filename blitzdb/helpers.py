@@ -16,12 +16,14 @@ def get_value(obj, key, create=False):
                 current_dict = last_dict[last_key]
             else:
                 raise KeyError
+
         last_key = key_fragment
         last_dict = current_dict
         try:
             current_dict = current_dict[key_fragment]
         except TypeError:
             raise KeyError
+
     return current_dict
 
 
@@ -40,6 +42,7 @@ def set_value(obj, key, value, overwrite=True):
                 current_dict = last_dict[last_key]
             else:
                 raise
+
         last_dict = current_dict
         last_key = key_fragment
         current_dict = current_dict[key_fragment]
@@ -59,8 +62,10 @@ def delete_value(obj, key):
         try:
             if key_fragment not in current_dict:
                 return
+
         except TypeError:
             return
+
         last_dict = current_dict
         current_dict = current_dict[key_fragment]
 

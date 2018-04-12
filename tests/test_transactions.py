@@ -30,7 +30,9 @@ def test_rollback_and_commit(transactional_backend, small_transactional_test_dat
     transactional_backend.rollback()
 
     assert len(movies) == len(transactional_backend.filter(Movie, {}))
-    assert sorted(movies, key=lambda x: x.pk) == sorted(transactional_backend.filter(Movie, {}), key=lambda x: x.pk)
+    assert sorted(movies, key=lambda x: x.pk) == sorted(
+        transactional_backend.filter(Movie, {}), key=lambda x: x.pk
+    )
 
     transactional_backend.begin()
     transactional_backend.filter(Movie, {}).delete()
@@ -38,6 +40,7 @@ def test_rollback_and_commit(transactional_backend, small_transactional_test_dat
 
     assert 0 == len(set(transactional_backend.filter(Movie, {})))
     assert [] == sorted(transactional_backend.filter(Movie, {}), key=lambda x: x.pk)
+
 
 def test_advanced_transaction(transactional_backend):
 
@@ -57,9 +60,13 @@ def test_advanced_transaction(transactional_backend):
 
     transactional_backend.rollback()
 
-    assert transactional_backend.get(Movie, {'title': 'The Godfather', 'year': 1979}).title == 'The Godfather'
+    assert transactional_backend.get(
+        Movie, {'title': 'The Godfather', 'year': 1979}
+    ).title == 'The Godfather'
 
-    assert transactional_backend.get(Movie, {'title': 'The Godfather', 'year': 1979}) == movie
+    assert transactional_backend.get(
+        Movie, {'title': 'The Godfather', 'year': 1979}
+    ) == movie
     assert len(transactional_backend.filter(Movie, {'year': 1979})) == 1
 
 
@@ -78,7 +85,9 @@ def test_autocommit_transaction(transactional_backend):
         with pytest.raises(Movie.DoesNotExist):
             transactional_backend.get(Movie, {'title': 'The Godfather', 'year': 1979})
 
-        assert transactional_backend.get(Movie, {'title': 'Star Wars IV', 'year': 1979}) == movie
+        assert transactional_backend.get(
+            Movie, {'title': 'Star Wars IV', 'year': 1979}
+        ) == movie
         assert len(transactional_backend.filter(Movie, {'year': 1979})) == 1
     finally:
         transactional_backend.autocommit = False

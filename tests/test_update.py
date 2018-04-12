@@ -9,7 +9,7 @@ from .helpers.movie_data import Actor
 
 def test_update_by_list(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -29,13 +29,13 @@ def test_update_by_list(backend):
     assert len(backend.filter(Actor, {'name': 'Robert de Niro'})) == 0
     assert len(backend.filter(Actor, {'name': 'Patrick Stewart'})) == 1
 
-    #we did not update the age field...
+    # we did not update the age field...
     assert backend.get(Actor, {'name': 'Patrick Stewart'}).age == 54
 
 
 def test_update_non_indexed_field(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -48,7 +48,7 @@ def test_update_non_indexed_field(backend):
     actor.name = 'Patrick Stewart'
     actor.age = 50
 
-    backend.update(actor, ('name','age'))
+    backend.update(actor, ('name', 'age'))
 
     backend.commit()
 
@@ -60,7 +60,7 @@ def test_update_non_indexed_field(backend):
 
 def test_multiple_updates(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -81,12 +81,12 @@ def test_multiple_updates(backend):
     assert len(backend.filter(Actor, {'name': 'Robert de Niro'})) == 0
     assert len(backend.filter(Actor, {'name': 'Patrick Stewart'})) == 1
 
-    assert backend.get(Actor, {'name' : 'Patrick Stewart'}).age == 50
+    assert backend.get(Actor, {'name': 'Patrick Stewart'}).age == 50
 
 
 def test_update_on_deleted_document_fails(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -107,7 +107,7 @@ def test_update_on_deleted_document_fails(backend):
 
 def test_update_with_dict(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -136,7 +136,7 @@ def test_update_with_dict(backend):
 
 def test_update_unset(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -159,7 +159,7 @@ def test_update_unset(backend):
 
 def test_update_set_then_unset(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})
@@ -183,7 +183,7 @@ def test_update_set_then_unset(backend):
 
 def test_update_unset_then_set(backend):
 
-    if isinstance(backend,FileBackend):
+    if isinstance(backend, FileBackend):
         return
 
     actor = Actor({'name': 'Robert de Niro', 'age': 54})

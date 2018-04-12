@@ -23,7 +23,10 @@ class QuerySet(BaseQuerySet):
     def _create_object_for(self, json_attributes):
         if self._raw:
             return json_attributes
-        deserialized_attributes = self.backend.deserialize(json_attributes,create_instance = False)
+
+        deserialized_attributes = self.backend.deserialize(
+            json_attributes, create_instance=False
+        )
         if '_id' in deserialized_attributes:
             del deserialized_attributes['_id']
         return self.backend.create_instance(self.cls, deserialized_attributes)
@@ -43,6 +46,7 @@ class QuerySet(BaseQuerySet):
             start, stop, step = key.start, key.stop, key.step
             if step != None:
                 raise IndexError("MongoDB slices do not support slice steps")
+
             if key.start == None:
                 start = 0
             if key.stop == None:
@@ -52,7 +56,10 @@ class QuerySet(BaseQuerySet):
             if stop < 0:
                 stop = self._cursor.count() + stop
             key = slice(start, stop)
-            return self.__class__(self.backend, self.cls, self._cursor.__getitem__(key), raw=self._raw)
+            return self.__class__(
+                self.backend, self.cls, self._cursor.__getitem__(key), raw=self._raw
+            )
+
         if key < 0:
             key = self._cursor.count() + key
         json_attributes = self._cursor[key]
@@ -68,6 +75,7 @@ class QuerySet(BaseQuerySet):
         for obj in obj_list:
             if obj.pk not in pks:
                 return False
+
         return True
 
     def rewind(self):
@@ -95,12 +103,19 @@ class QuerySet(BaseQuerySet):
 
     def __eq__(self, other):
         if isinstance(other, QuerySet):
-            if self.cls == other.cls and set(self._cursor.distinct('_id')) == set(other._cursor.distinct('_id')):
+            if (
+                self.cls == other.cls
+                and set(self._cursor.distinct('_id')) ==
+                set(other._cursor.distinct('_id'))
+            ):
                 return True
+
         elif isinstance(other, list):
             if len(other) != len(self.keys):
                 return False
+
             objs = list(self)
             if other == objs:
                 return True
+
         return False

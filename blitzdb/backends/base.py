@@ -17,6 +17,7 @@ class DoNotSerialize(BaseException):
     If an encoder throws this exception, the object in question will not get serialized.
     """
 
+
 class NotInTransaction(BaseException):
     """
     Gets raised if a function that must only be used inside a database transaction
@@ -30,27 +31,36 @@ class InTransaction(BaseException):
     gets called inside a transaction.
     """
 
+
 class ComplexEncoder(object):
 
     @classmethod
-    def encode(cls,obj,path):
-        if isinstance(obj,complex):
-            return {'_type' : 'complex','r' : obj.real,'i' : obj.imag}
+    def encode(cls, obj, path):
+        if isinstance(obj, complex):
+            return {'_type': 'complex', 'r': obj.real, 'i': obj.imag}
+
         return obj
 
     @classmethod
-    def decode(cls,obj):
-        if isinstance(obj,dict) and obj.get('_type') == 'complex':
-            return 1j*obj['i']+obj['r']
+    def decode(cls, obj):
+        if isinstance(obj, dict) and obj.get('_type') == 'complex':
+            return 1j * obj['i'] + obj['r']
+
         return obj
+
 
 class ComplexQueryEncoder(object):
 
     @classmethod
-    def encode(cls,obj,path):
-        if isinstance(obj,complex):
-            raise ValueError("Currently complex values are not supported in queries! Please write your queries using the imaginary and real values instead.")
+    def encode(cls, obj, path):
+        if isinstance(obj, complex):
+            raise ValueError(
+                "Currently complex values are not supported in queries! "
+                "Please write your queries using the imaginary and real values instead."
+            )
+
         return obj
+
 
 class Backend(object):
 
@@ -76,7 +86,12 @@ class Backend(object):
     standard_encoders = [ComplexEncoder]
     query_encoders = [ComplexQueryEncoder]
 
-    def __init__(self, autodiscover_classes=True, autoload_embedded=True, allow_documents_in_query=True):
+    def __init__(
+        self,
+        autodiscover_classes=True,
+        autoload_embedded=True,
+        allow_documents_in_query=True,
+    ):
         self.classes = {}
         self.deprecated_classes = {}
         self.collections = {}
@@ -94,13 +109,13 @@ class Backend(object):
         for document_class in document_classes:
             self.register(document_class)
 
-    def unregister(self,cls):
+    def unregister(self, cls):
 
         if cls in self.classes:
             del self.collections[self.classes[cls]['collection']]
             del self.classes[cls]
 
-    def register(self, cls, parameters=None,overwrite = False):
+    def register(self, cls, parameters=None, overwrite=False):
         """
         Explicitly register a new document class for use in the backend.
 
@@ -137,29 +152,35 @@ class Backend(object):
             parameters = {}
         if 'collection' in parameters:
             collection_name = parameters['collection']
-        elif hasattr(cls.Meta,'collection'):
+        elif hasattr(cls.Meta, 'collection'):
             collection_name = cls.Meta.collection
         else:
             collection_name = cls.__name__.lower()
 
         delete_list = []
 
-        def register_class(collection_name,cls):
+        def register_class(collection_name, cls):
             self.collections[collection_name] = cls
             self.classes[cls] = parameters.copy()
             self.classes[cls]['collection'] = collection_name
 
         if collection_name in self.collections:
             old_cls = self.collections[collection_name]
-            if (issubclass(cls,old_cls) and not (cls is old_cls)) or overwrite:
-                logger.warning("Replacing class %s with %s for collection %s" % (old_cls,cls,collection_name))
+            if (issubclass(cls, old_cls) and not (cls is old_cls)) or overwrite:
+                logger.warning(
+                    "Replacing class %s with %s for collection %s" %
+                    (old_cls, cls, collection_name)
+                )
                 self.deprecated_classes[old_cls] = self.classes[old_cls]
                 del self.classes[old_cls]
-                register_class(collection_name,cls)
+                register_class(collection_name, cls)
                 return True
+
         else:
-            logger.debug("Registering class %s under collection %s" % (cls,collection_name))
-            register_class(collection_name,cls)
+            logger.debug(
+                "Registering class %s under collection %s" % (cls, collection_name)
+            )
+            register_class(collection_name, cls)
             return True
 
         return False
@@ -171,9 +192,9 @@ class Backend(object):
                 boring = dir(type(b'dummy', (object,), {}))
             else:
                 boring = dir(type('dummy', (object,), {}))
-            return dict([item
-                         for item in inspect.getmembers(cls)
-                         if item[0] not in boring])
+            return dict(
+                [item for item in inspect.getmembers(cls) if item[0] not in boring]
+            )
 
         if hasattr(cls, 'Meta'):
             params = get_user_attributes(cls.Meta)
@@ -192,11 +213,16 @@ class Backend(object):
         params = self.get_meta_attributes(cls)
         return self.register(cls, params)
 
-    def serialize(self, obj, convert_keys_to_str=False,
-                  embed_level=0,
-                  encoders=None,
-                  autosave=True,
-                  for_query=False,path = None):
+    def serialize(
+        self,
+        obj,
+        convert_keys_to_str=False,
+        embed_level=0,
+        encoders=None,
+        autosave=True,
+        for_query=False,
+        path=None,
+    ):
         """
         Serializes a given object, i.e. converts it to a representation that can be stored in the database.
         This usually involves replacing all `Document` instances by database references to them.
@@ -214,59 +240,74 @@ class Backend(object):
         if path is None:
             path = []
 
-        def get_value(obj,key):
+        def get_value(obj, key):
             key_fragments = key.split(".")
             current_dict = obj
             for key_fragment in key_fragments:
                 current_dict = current_dict[key_fragment]
             return current_dict
 
-        serialize_with_opts = lambda value,*args,**kwargs : self.serialize(value,*args,
-                                                                           encoders = encoders,
-                                                                           convert_keys_to_str = convert_keys_to_str,
-                                                                           autosave = autosave,
-                                                                           for_query = for_query,
-                                                                           **kwargs)
+        serialize_with_opts = lambda value, *args, **kwargs: self.serialize(
+            value,
+            *args,
+            encoders=encoders,
+            convert_keys_to_str=convert_keys_to_str,
+            autosave=autosave,
+            for_query=for_query,
+            **kwargs
+        )
 
         if encoders is None:
             encoders = []
 
-        for encoder in self.standard_encoders+encoders:
-            obj = encoder.encode(obj,path = path)
+        for encoder in self.standard_encoders + encoders:
+            obj = encoder.encode(obj, path=path)
 
         def encode_as_str(obj):
             if six.PY3:
                 return str(obj)
+
             else:
-                if isinstance(obj,unicode):
+                if isinstance(obj, unicode):
                     return obj
-                elif isinstance(obj,str):
+
+                elif isinstance(obj, str):
                     return unicode(obj)
+
                 else:
-                    return unicode(str(obj),errors='replace')
+                    return unicode(str(obj), errors='replace')
 
         if isinstance(obj, dict):
             output_obj = {}
             for key, value in obj.items():
-                new_path = path[:]+[key]
+                new_path = path[:] + [key]
                 try:
-                    output_obj[encode_as_str(key) if convert_keys_to_str else key] = serialize_with_opts(value, embed_level=embed_level,path = new_path)
+                    output_obj[
+                        encode_as_str(key) if convert_keys_to_str else key
+                    ] = serialize_with_opts(
+                        value, embed_level=embed_level, path=new_path
+                    )
                 except DoNotSerialize:
                     pass
-        elif isinstance(obj,six.string_types):
+        elif isinstance(obj, six.string_types):
             output_obj = encode_as_str(obj)
-        elif isinstance(obj, (list,tuple)):
+        elif isinstance(obj, (list, tuple)):
             try:
-                output_obj = [serialize_with_opts(x, embed_level=embed_level,path = path[:]+[i]) for i,x in enumerate(obj)]
+                output_obj = [
+                    serialize_with_opts(x, embed_level=embed_level, path=path[:] + [i])
+                    for i, x in enumerate(obj)
+                ]
             except DoNotSerialize:
                 pass
         elif isinstance(obj, Document):
             collection = self.get_collection_for_obj(obj)
             if embed_level > 0:
                 try:
-                    output_obj = self.serialize(obj, embed_level=embed_level-1)
-                except obj.DoesNotExist:#cannot load object, ignoring...
-                    output_obj = self.serialize(obj.lazy_attributes, embed_level=embed_level-1)
+                    output_obj = self.serialize(obj, embed_level=embed_level - 1)
+                except obj.DoesNotExist:  # cannot load object, ignoring...
+                    output_obj = self.serialize(
+                        obj.lazy_attributes, embed_level=embed_level - 1
+                    )
                 except DoNotSerialize:
                     pass
             elif obj.embed:
@@ -281,21 +322,41 @@ class Backend(object):
                     if obj.get_pk_name() in output_obj:
                         del output_obj[obj.get_pk_name()]
                     output_obj['pk'] = obj.pk
-                    output_obj['__collection__'] = self.classes[obj.__class__]['collection']
+                    output_obj['__collection__'] = self.classes[obj.__class__][
+                        'collection'
+                    ]
                 else:
                     if for_query and not self._allow_documents_in_query:
                         raise ValueError("Documents are not allowed in queries!")
-                    if for_query:
-                        output_obj = {'$elemMatch' : {'pk':obj.pk,'__collection__':self.classes[obj.__class__]['collection']}}
-                    else:
-                        ref = "%s:%s" % (self.classes[obj.__class__]['collection'],str(obj.pk))
-                        output_obj = {'__ref__' : ref,'pk':obj.pk,'__collection__':self.classes[obj.__class__]['collection']}
 
-                if hasattr(obj,'Meta') and hasattr(obj.Meta,'dbref_includes') and obj.Meta.dbref_includes:
+                    if for_query:
+                        output_obj = {
+                            '$elemMatch': {
+                                'pk': obj.pk,
+                                '__collection__': self.classes[obj.__class__][
+                                    'collection'
+                                ],
+                            }
+                        }
+                    else:
+                        ref = "%s:%s" % (
+                            self.classes[obj.__class__]['collection'], str(obj.pk)
+                        )
+                        output_obj = {
+                            '__ref__': ref,
+                            'pk': obj.pk,
+                            '__collection__': self.classes[obj.__class__]['collection'],
+                        }
+
+                if (
+                    hasattr(obj, 'Meta')
+                    and hasattr(obj.Meta, 'dbref_includes')
+                    and obj.Meta.dbref_includes
+                ):
                     for include_key in obj.Meta.dbref_includes:
                         try:
-                            value = get_value(obj,include_key)
-                            output_obj[include_key.replace(".","_")] = value
+                            value = get_value(obj, include_key)
+                            output_obj[include_key.replace(".", "_")] = value
                         except KeyError:
                             continue
 
@@ -321,8 +382,13 @@ class Backend(object):
             obj = encoder.decode(obj)
 
         if isinstance(obj, dict):
-            if create_instance and '__collection__' in obj and obj['__collection__'] in self.collections and 'pk' in obj:
-                #for backwards compatibility
+            if (
+                create_instance
+                and '__collection__' in obj
+                and obj['__collection__'] in self.collections
+                and 'pk' in obj
+            ):
+                # for backwards compatibility
                 attributes = copy.deepcopy(obj)
                 del attributes['__collection__']
                 if '__ref__' in attributes:
@@ -332,19 +398,29 @@ class Backend(object):
                     del attributes['__lazy__']
                 else:
                     lazy = True
-                output_obj = self.create_instance(obj['__collection__'], attributes, lazy=lazy)
+                output_obj = self.create_instance(
+                    obj['__collection__'], attributes, lazy=lazy
+                )
             else:
                 output_obj = {}
                 for key, value in obj.items():
-                    output_obj[key] = self.deserialize(value,encoders = encoders)
-        elif isinstance(obj, (list,tuple)):
+                    output_obj[key] = self.deserialize(value, encoders=encoders)
+        elif isinstance(obj, (list, tuple)):
             output_obj = list(map(lambda x: self.deserialize(x), obj))
         else:
             output_obj = obj
 
         return output_obj
 
-    def create_instance(self, collection_or_class, attributes, lazy=False, call_hook=True, deserialize=True, db_loader=None):
+    def create_instance(
+        self,
+        collection_or_class,
+        attributes,
+        lazy=False,
+        call_hook=True,
+        deserialize=True,
+        db_loader=None,
+    ):
         """
         Creates an instance of a `Document` class corresponding to the given collection name or class.
 
@@ -355,10 +431,10 @@ class Backend(object):
         :returns: An instance of the requested Document class with the given attributes.
         """
         creation_args = {
-            'backend' : self,
-            'autoload' : self._autoload_embedded,
-            'lazy' : lazy,
-            'db_loader' : db_loader
+            'backend': self,
+            'autoload': self._autoload_embedded,
+            'lazy': lazy,
+            'db_loader': db_loader,
         }
 
         if collection_or_class in self.classes:
@@ -366,21 +442,27 @@ class Backend(object):
         elif collection_or_class in self.collections:
             cls = self.collections[collection_or_class]
         else:
-            raise AttributeError("Unknown collection or class: %s!" % str(collection_or_class))
+            raise AttributeError(
+                "Unknown collection or class: %s!" % str(collection_or_class)
+            )
 
-        #we deserialize the attributes that we receive
+        # we deserialize the attributes that we receive
         if deserialize:
-            deserialized_attributes = self.deserialize(attributes, create_instance=False)
+            deserialized_attributes = self.deserialize(
+                attributes, create_instance=False
+            )
         else:
             deserialized_attributes = attributes
 
         if 'constructor' in self.classes[cls]:
-            obj = self.classes[cls]['constructor'](deserialized_attributes, **creation_args)
+            obj = self.classes[cls]['constructor'](
+                deserialized_attributes, **creation_args
+            )
         else:
             obj = cls(deserialized_attributes, **creation_args)
 
         if call_hook:
-            self.call_hook('after_load',obj)
+            self.call_hook('after_load', obj)
 
         return obj
 
@@ -389,33 +471,34 @@ class Backend(object):
     def current_transaction(self):
         pass
 
-    def transaction(self,implicit = False):
+    def transaction(self, implicit=False):
         """
         This returns a context guard which will automatically open and close a transaction
         """
 
         class TransactionManager(object):
 
-            def __init__(self,backend,implicit = False):
+            def __init__(self, backend, implicit=False):
                 self.backend = backend
-                self.implicit =  implicit
+                self.implicit = implicit
 
             def __enter__(self):
                 self.within_transaction = True if self.backend.current_transaction else False
                 self.transaction = self.backend.begin()
 
-            def __exit__(self,exc_type,exc_value,traceback_obj):
+            def __exit__(self, exc_type, exc_value, traceback_obj):
                 if exc_type:
                     self.backend.rollback(self.transaction)
                     return False
+
                 else:
-                    #if the transaction has been created implicitly and we are not within
-                    #another transaction, we leave it open (the user needs to call commit manually)
-                    #if self.implicit and not self.within_transaction:
+                    # if the transaction has been created implicitly and we are not within
+                    # another transaction, we leave it open (the user needs to call commit manually)
+                    # if self.implicit and not self.within_transaction:
                     #    return
                     self.backend.commit(self.transaction)
 
-        return TransactionManager(self,implicit = implicit)
+        return TransactionManager(self, implicit=implicit)
 
     def get_collection_for_obj(self, obj):
         """
@@ -436,10 +519,15 @@ class Backend(object):
         :returns: The collection name for the given class.
         """
         if cls not in self.classes:
-            if issubclass(cls, Document) and cls not in self.classes and cls not in self.deprecated_classes:
+            if (
+                issubclass(cls, Document)
+                and cls not in self.classes
+                and cls not in self.deprecated_classes
+            ):
                 self.autoregister(cls)
             else:
                 raise AttributeError("Unknown object type: %s" % cls.__name__)
+
         collection = self.classes[cls]['collection']
         return collection
 
@@ -454,6 +542,7 @@ class Backend(object):
         for cls in self.classes:
             if cls.__name__ == cls_name:
                 return self.classes[cls]['collection']
+
         raise AttributeError("Unknown class name: %s" % cls_name)
 
     def get_cls_for_collection(self, collection):
@@ -467,12 +556,14 @@ class Backend(object):
         for cls, params in self.classes.items():
             if params['collection'] == collection:
                 return cls
+
         raise AttributeError("Unknown collection: %s" % collection)
 
-    def call_hook(self,name,obj,*args,**kwargs):
+    def call_hook(self, name, obj, *args, **kwargs):
         try:
             hook = obj.get_lazy_attribute(name)
-            return hook(*args,**kwargs)
+            return hook(*args, **kwargs)
+
         except AttributeError:
             pass
 

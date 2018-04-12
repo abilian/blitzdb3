@@ -23,13 +23,15 @@ def mockup_backend():
 
     return Backend()
 
+
 def test_unicode():
 
-    doc = Document({'pk' : 'foo'})
+    doc = Document({'pk': 'foo'})
     if six.PY2:
         assert unicode(str(doc)) == unicode(doc)
     else:
         assert doc.__unicode__ == doc.__str__
+
 
 def test_basic_attributes():
 
@@ -47,6 +49,7 @@ def test_basic_attributes():
 
     assert doc.attributes == attributes
 
+
 def test_iteration():
 
     attributes = {'foo': 'bar', 'baz': 1243, 'd': {1: 3, 4: 5}, 'l': [1, 2, 3, 4]}
@@ -56,7 +59,7 @@ def test_iteration():
     for key in doc:
         assert key in attributes
 
-    for key,value in doc.items():
+    for key, value in doc.items():
         assert key in attributes
         assert attributes[key] == value
 
@@ -153,9 +156,10 @@ def test_lazy_attributes(mockup_backend):
     assert doc._lazy == False
     assert doc.foo == 'faz'
 
+
 def test_properties():
 
-    my_document = Document({'foo' : 'baz'})
+    my_document = Document({'foo': 'baz'})
 
     my_document.properties['foo'] = 'bar'
 
@@ -172,7 +176,6 @@ def test_class_properties(mockup_backend):
         def path(self):
             return 'foo'
 
-
     def get_lazy_doc():
         return MyDocument({'pk': 1}, lazy=True, backend=mockup_backend)
 
@@ -182,12 +185,13 @@ def test_class_properties(mockup_backend):
 
     assert doc._lazy == True
     assert doc.path == 'foo'
-    assert hasattr(doc,'path')
+    assert hasattr(doc, 'path')
     assert doc._lazy
     assert not 'path' in doc
-    #we force a revert
+    # we force a revert
     doc.attributes
     assert not 'path' in doc
+
 
 def test_container_operations():
 

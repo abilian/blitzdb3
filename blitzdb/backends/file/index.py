@@ -74,7 +74,7 @@ class Index(object):
         """
         return self._params['key']
 
-    def get_value(self, attributes,key = None):
+    def get_value(self, attributes, key=None):
         """Get value to be indexed from document attributes.
 
         :param attributes: Document attributes
@@ -90,10 +90,11 @@ class Index(object):
 
         # A splitted key like 'a.b.c' goes into nested properties
         # and the value is retrieved recursively
-        for i,elem in enumerate(key):
-            if isinstance(value, (list,tuple)):
-                #if this is a list, we return all matching values for the given list items
-                return [self.get_value(v,key[i:]) for v in value]
+        for i, elem in enumerate(key):
+            if isinstance(value, (list, tuple)):
+                # if this is a list, we return all matching values for the given list items
+                return [self.get_value(v, key[i:]) for v in value]
+
             else:
                 value = value[elem]
 
@@ -107,6 +108,7 @@ class Index(object):
         """
         if not self._store:
             raise AttributeError('No datastore defined!')
+
         saved_data = self.save_to_data(in_place=True)
         data = Serializer.serialize(saved_data)
         self._store.store_blob(data, 'all_keys_with_undefined')
@@ -142,15 +144,18 @@ class Index(object):
         """
         if not self._store:
             raise AttributeError('No datastore defined!')
+
         if self._store.has_blob('all_keys'):
             data = Serializer.deserialize(self._store.get_blob('all_keys'))
             self.load_from_data(data)
             return True
+
         elif self._store.has_blob('all_keys_with_undefined'):
             blob = self._store.get_blob('all_keys_with_undefined')
             data = Serializer.deserialize(blob)
             self.load_from_data(data, with_undefined=True)
             return True
+
         else:
             return False
 
@@ -169,11 +174,7 @@ class Index(object):
 
         """
         # to do: check that all reverse index values are unambiguous
-        missing_keys = [
-            key
-            for key in keys
-            if not len(self._reverse_index[key])
-        ]
+        missing_keys = [key for key in keys if not len(self._reverse_index[key])]
         keys_and_values = [
             (key, self._reverse_index[key][0])
             for key in keys
@@ -184,12 +185,15 @@ class Index(object):
             for kv in sorted(
                 keys_and_values,
                 key=lambda x: x[1],
-                reverse=True if order == QuerySet.DESCENDING else False)
+                reverse=True if order == QuerySet.DESCENDING else False,
+            )
         ]
         if order == QuerySet.ASCENDING:
             return missing_keys + sorted_keys
+
         elif order == QuerySet.DESCENDING:
             return sorted_keys + missing_keys
+
         else:
             raise ValueError('Unexpected order value: {:d}'.format(order))
 
@@ -203,10 +207,8 @@ class Index(object):
 
         """
         if in_place:
-            return [
-                list(self._index.items()),
-                list(self._undefined_keys.keys())
-            ]
+            return [list(self._index.items()), list(self._undefined_keys.keys())]
+
         return (
             [(key, values[:]) for key, values in self._index.items()],
             list(self._undefined_keys.keys()),
@@ -243,20 +245,20 @@ class Index(object):
         :rtype: str
 
         """
-        if isinstance(value,dict) and '__ref__' in value:
+        if isinstance(value, dict) and '__ref__' in value:
             return self.get_hash_for(value['__ref__'])
+
         serialized_value = self._serializer(value)
         if isinstance(serialized_value, dict):
             # Hash each item and return the hash of all the hashes
-            return hash(frozenset([
-                self.get_hash_for(x)
-                for x in serialized_value.items()
-            ]))
-        elif isinstance(serialized_value, (list,tuple)):
+            return hash(
+                frozenset([self.get_hash_for(x) for x in serialized_value.items()])
+            )
+
+        elif isinstance(serialized_value, (list, tuple)):
             # Hash each element and return the hash of all the hashes
-            return hash(tuple([
-                self.get_hash_for(x) for x in serialized_value
-            ]))
+            return hash(tuple([self.get_hash_for(x) for x in serialized_value]))
+
         return value
 
     def get_keys_for(self, value):
@@ -270,6 +272,7 @@ class Index(object):
         """
         if callable(value):
             return value(self)
+
         hash_value = self.get_hash_for(value)
         return self._index[hash_value][:]
 
@@ -295,6 +298,7 @@ class Index(object):
         """
         if self._unique and hash_value in self._index:
             raise NonUnique('Hash value {} already in index'.format(hash_value))
+
         if store_key not in self._index[hash_value]:
             self._index[hash_value].append(store_key)
         if hash_value not in self._reverse_index[store_key]:
@@ -318,7 +322,7 @@ class Index(object):
         # We remove old values in _reverse_index
         self.remove_key(store_key)
         if not undefined:
-            if isinstance(value, (list,tuple)):
+            if isinstance(value, (list, tuple)):
                 # We add an extra hash value for the list itself
                 # (this allows for querying the whole list)
                 values = value
@@ -388,15 +392,14 @@ class TransactionalIndex(Index):
 
     def commit(self):
         """Commit current transaction."""
-        if (not self._add_cache and
-                not self._remove_cache and
-                not self._undefined_cache):
+        if (
+            not self._add_cache and not self._remove_cache and not self._undefined_cache
+        ):
             return
 
         for store_key, hash_values in self._add_cache.items():
             for hash_value in hash_values:
-                super(TransactionalIndex, self).add_hashed_value(
-                    hash_value, store_key)
+                super(TransactionalIndex, self).add_hashed_value(hash_value, store_key)
         for store_key in self._remove_cache:
             super(TransactionalIndex, self).remove_key(store_key)
         for store_key in self._undefined_cache:
@@ -411,9 +414,9 @@ class TransactionalIndex(Index):
         """Drop changes from current transaction."""
         if not self._in_transaction:
             raise NotInTransaction
+
         self._init_cache()
         self._in_transaction = False
-
 
     def add_undefined(self, store_key):
         """Add undefined key to the index.
@@ -470,6 +473,7 @@ class TransactionalIndex(Index):
         """
         if not include_uncommitted:
             return super(TransactionalIndex, self).get_keys_for(value)
+
         else:
             keys = super(TransactionalIndex, self).get_keys_for(value)
             hash_value = self.get_hash_for(value)

@@ -26,6 +26,7 @@ class QuerySet(BaseQuerySet):
     def next(self):
         if self._i >= len(self):
             raise StopIteration
+
         self._i += 1
         return self[self._i - 1]
 
@@ -48,6 +49,7 @@ class QuerySet(BaseQuerySet):
     def __getitem__(self, i):
         if isinstance(i, slice):
             return self.__class__(self.backend, self.cls, self.store, self.keys[i])
+
         key = self.keys[i]
         if key not in self.objects:
             self.objects[key] = self.backend.get_object(self.cls, key)
@@ -83,18 +85,23 @@ class QuerySet(BaseQuerySet):
                 storage_key = self.backend.get_storage_key_for(obj)
             except obj.DoesNotExist:
                 return False
+
             if storage_key not in self.keys:
                 return False
+
         return True
 
     def __eq__(self, other):
         if isinstance(other, QuerySet):
             if self.cls == other.cls and set(self.keys) == set(other.keys):
                 return True
+
         elif isinstance(other, list):
             if len(other) != len(self.keys):
                 return False
+
             objs = list(self)
             if other == objs:
                 return True
+
         return False

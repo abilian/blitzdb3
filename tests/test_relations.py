@@ -20,16 +20,17 @@ def test_basic_storage(backend, small_test_data):
     assert len(backend.filter(Movie, {})) == len(movies)
     assert len(backend.filter(Actor, {})) == len(actors)
 
+
 def test_delete(backend):
 
-    actor = Actor({'foo' : 'bar'})
+    actor = Actor({'foo': 'bar'})
 
     backend.save(actor)
     backend.commit()
 
     assert actor.foo == 'bar'
 
-    assert backend.get(Actor,{'pk' : actor.pk}).foo == 'bar'
+    assert backend.get(Actor, {'pk': actor.pk}).foo == 'bar'
 
     del actor.foo
 
@@ -43,4 +44,4 @@ def test_delete(backend):
     backend.commit()
 
     with pytest.raises(AttributeError):
-        backend.get(Actor,{'pk' : actor.pk}).foo
+        backend.get(Actor, {'pk': actor.pk}).foo
