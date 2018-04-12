@@ -185,7 +185,7 @@ class Index(object):
             for kv in sorted(
                 keys_and_values,
                 key=lambda x: x[1],
-                reverse=True if order == QuerySet.DESCENDING else False,
+                reverse=(order == QuerySet.DESCENDING),
             )
         ]
         if order == QuerySet.ASCENDING:

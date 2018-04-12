@@ -226,7 +226,7 @@ class Document(object):
         return self[key] if key in self else default
 
     def has_key(self, key):
-        return True if key in self else False
+        return key in self
 
     def keys(self):
         return self.attributes.keys()

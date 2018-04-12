@@ -253,7 +253,7 @@ class Backend(BaseBackend):
                 'collection': related_collection,
                 'class': related_class,
                 'type': self.get_field_type(cls.Meta.PkType),
-                'is_backref': True if backref is not None else False,
+                'is_backref': backref is not None,
                 'backref': backref,
             }
 
@@ -297,7 +297,7 @@ class Backend(BaseBackend):
                     use_alter=False,
                 ),
                 index=True,
-                nullable=True if field.nullable else False,
+                nullable=bool(field.nullable),
             )
 
             params = {
@@ -307,7 +307,7 @@ class Backend(BaseBackend):
                 'collection': related_collection,
                 'class': related_class,
                 'type': self.get_field_type(related_class.Meta.PkType),
-                'is_backref': True if backref is not None else False,
+                'is_backref': backref is not None,
                 'backref': backref,
             }
 
@@ -1402,7 +1402,7 @@ class Backend(BaseBackend):
 
             where_statements = []
 
-            if any([True if key.startswith('$') else False for key in query.keys()]):
+            if any(key.startswith('$') for key in query.keys()):
                 # this is a special operator query
                 if len(query) > 1:
                     raise AttributeError('Currently not supported!')

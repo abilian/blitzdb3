@@ -483,7 +483,7 @@ class Backend(object):
                 self.implicit = implicit
 
             def __enter__(self):
-                self.within_transaction = True if self.backend.current_transaction else False
+                self.within_transaction = bool(self.backend.current_transaction)
                 self.transaction = self.backend.begin()
 
             def __exit__(self, exc_type, exc_value, traceback_obj):
