@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import abc
 import copy
 import inspect
@@ -165,7 +167,10 @@ class Backend(object):
     def get_meta_attributes(self, cls):
 
         def get_user_attributes(cls):
-            boring = dir(type('dummy', (object,), {}))
+            if six.PY2:
+                boring = dir(type(b'dummy', (object,), {}))
+            else:
+                boring = dir(type('dummy', (object,), {}))
             return dict([item
                          for item in inspect.getmembers(cls)
                          if item[0] not in boring])

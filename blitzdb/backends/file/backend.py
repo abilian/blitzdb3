@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import os
 import os.path
 import uuid
@@ -8,13 +10,14 @@ import six
 import blitzdb
 from blitzdb.backends.base import Backend as BaseBackend
 from blitzdb.backends.base import NotInTransaction
-from blitzdb.backends.file.index import Index, TransactionalIndex
-from blitzdb.backends.file.queries import compile_query
-from blitzdb.backends.file.queryset import QuerySet
-from blitzdb.backends.file.serializers import JsonSerializer, PickleSerializer
-from blitzdb.backends.file.store import Store, TransactionalStore
 from blitzdb.document import Document
 from blitzdb.helpers import delete_value, get_value, set_value
+
+from .index import Index, TransactionalIndex
+from .queries import compile_query
+from .queryset import QuerySet
+from .serializers import JsonSerializer, PickleSerializer
+from .store import Store, TransactionalStore
 
 store_classes = {
     'transactional': TransactionalStore,

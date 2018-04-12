@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import logging
 import traceback
 import uuid
@@ -8,11 +10,13 @@ import six
 
 from blitzdb.backends.base import Backend as BaseBackend
 from blitzdb.backends.base import NotInTransaction
-from blitzdb.backends.mongo.queryset import QuerySet
 from blitzdb.document import Document
 from blitzdb.helpers import delete_value, get_value, set_value
 
+from .queryset import QuerySet
+
 logger = logging.getLogger(__name__)
+
 
 class DotEncoder(object):
 

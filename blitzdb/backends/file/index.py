@@ -1,10 +1,13 @@
 """File backend index."""
+from __future__ import absolute_import, print_function, unicode_literals
+
 import copy
 from collections import defaultdict
 
 from blitzdb.backends.base import NotInTransaction
-from blitzdb.backends.file.queryset import QuerySet
-from blitzdb.backends.file.serializers import PickleSerializer as Serializer
+
+from .queryset import QuerySet
+from .serializers import PickleSerializer as Serializer
 
 
 class NonUnique(BaseException):

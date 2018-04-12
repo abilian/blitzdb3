@@ -1,8 +1,10 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import json
 
 import six
 
-from blitzdb.backends.file.utils import JsonEncoder
+from .utils import JsonEncoder
 
 if six.PY3:
     import pickle as cPickle
