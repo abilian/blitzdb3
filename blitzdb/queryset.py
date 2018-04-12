@@ -6,7 +6,7 @@ import abc
 class QuerySet(object):
 
     """
-    Stores information about objects returned by a database query and retrieves instances of 
+    Stores information about objects returned by a database query and retrieves instances of
     these objects if necessary.
 
     :param backend: The backend to use for :py:meth:filter`filtering` etc.
@@ -83,7 +83,7 @@ class QuerySet(object):
     def __eq__(self, other):
         """
         Checks if two query sets are equal. Implement this in your derived query set class.
-        
+
         :param other: The object this query set is compared to.
         """
         raise NotImplementedError

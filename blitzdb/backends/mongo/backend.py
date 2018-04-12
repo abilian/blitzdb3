@@ -199,8 +199,6 @@ class Backend(BaseBackend):
             raise obj.DoesNotExist("update() called on document without primary key!")
 
         def serialize_fields(fields):
-
-
             if isinstance(fields, (list, tuple)):
                 update_dict = {}
                 for key in fields:
@@ -226,7 +224,6 @@ class Backend(BaseBackend):
             unset_attributes = []
 
         self.call_hook('before_update', obj, set_attributes, unset_attributes)
-
 
         set_attributes = {
             key: self.serialize(value) for key, value in set_attributes.items()
