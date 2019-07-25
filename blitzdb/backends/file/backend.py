@@ -38,10 +38,9 @@ class DatabaseIndexError(BaseException):
 
     """Gets raised when the index of the database is corrupted.
 
-    Ideally this should never happen. To recover from this error, you can call
-    the `rebuild_index` function of the file backend with the affected
-    collection and key as parameters.
-
+    Ideally this should never happen. To recover from this error, you
+    can call the `rebuild_index` function of the file backend with the
+    affected collection and key as parameters.
     """
 
 
@@ -63,7 +62,6 @@ class Backend(BaseBackend):
         worry about calling `commit` by hand. Please be advised that this can
         incur a significant overhead in write time since a `commit` will
         trigger a complete rewrite of all indexes to disk.
-
     """
 
     # the default configuration values.
@@ -165,7 +163,6 @@ class Backend(BaseBackend):
             This operation can be **expensive** in runtime if a large number of
             documents (>100.000) is contained in the database, since it will
             cause all database indexes to be written to disk.
-
         """
         for collection in self.collections:
             store = self.get_collection_store(collection)
@@ -188,7 +185,8 @@ class Backend(BaseBackend):
     def create_index(
         self, cls_or_collection, params=None, fields=None, ephemeral=False, unique=False
     ):
-        """Create new index on the given collection/class with given parameters.
+        """Create new index on the given collection/class with given
+        parameters.
 
         :param cls_or_collection:
             The name of the collection or the class for which to create an
@@ -234,7 +232,6 @@ class Backend(BaseBackend):
             referenced objects) are currently not supported by Blitz, which
             means you can't create an index on an attribute value of a document
             that is embedded in another document.
-
         """
         if params:
             return self.create_indexes(
@@ -264,7 +261,6 @@ class Backend(BaseBackend):
         :param collection: the collection for which to return the primary index
 
         :returns: the primary key index of the given collection
-
         """
         cls = self.collections[collection]
 
@@ -451,9 +447,8 @@ class Backend(BaseBackend):
         return obj
 
     def update(self, obj, set_fields=None, unset_fields=None, update_obj=True):
-        """
-        We return the result of the save method (updates are not yet implemented here).
-        """
+        """We return the result of the save method (updates are not yet
+        implemented here)."""
         if set_fields:
             if isinstance(set_fields, (list, tuple)):
                 set_attributes = {}
@@ -594,9 +589,8 @@ class Backend(BaseBackend):
 
     def _canonicalize_query(self, query):
 
-        """
-        Transform the query dictionary to replace e.g. documents with __ref__ fields.
-        """
+        """Transform the query dictionary to replace e.g. documents with
+        __ref__ fields."""
 
         def transform_query(q):
 

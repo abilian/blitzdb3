@@ -52,8 +52,7 @@ class ExcludedFieldsEncoder(object):
 
 class Backend(BaseBackend):
 
-    """
-    A SQL backend.
+    """A SQL backend.
 
     :param db: An instance of a `sqlalchemy.
     <http://www.sqlalchemy.org>`_ class
@@ -1380,8 +1379,8 @@ class Backend(BaseBackend):
             raise cls.DoesNotExist
 
     def filter(self, cls_or_collection, query, raw=False, only=None, include=None):
-        """
-        Filter objects from the database that correspond to a given set of properties.
+        """Filter objects from the database that correspond to a given set of
+        properties.
 
         See :py:meth:`blitzdb.backends.base.Backend.filter` for documentation of individual parameters
 
@@ -1389,7 +1388,6 @@ class Backend(BaseBackend):
 
             This function supports all query operators that are available in SQLAlchemy and returns a query set
             that is based on a SQLAlchemy cursor.
-
         """
 
         if not isinstance(cls_or_collection, six.string_types):
@@ -1407,9 +1405,8 @@ class Backend(BaseBackend):
         havings = []
 
         def compile_query(collection, query, table=None, path=None):
-            """
-            This function emits a list of WHERE statements that can be used to retrieve
-            """
+            """This function emits a list of WHERE statements that can be used
+            to retrieve."""
 
             if path is None:
                 path = []

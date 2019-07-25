@@ -11,9 +11,7 @@ import os.path
 
 class Store(object):
 
-    """
-    This class stores binary data in files.
-    """
+    """This class stores binary data in files."""
 
     def __init__(self, properties):
         self._properties = properties
@@ -63,9 +61,7 @@ class Store(object):
 
 class TransactionalStore(Store):
 
-    """
-    This class adds transaction support to the Store class.
-    """
+    """This class adds transaction support to the Store class."""
 
     def __init__(self, properties):
         super(TransactionalStore, self).__init__(properties)

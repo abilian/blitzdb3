@@ -5,8 +5,7 @@ from .base import BaseField
 
 class ManyToManyField(BaseField):
 
-    """
-    """
+    """"""
 
     def __init__(
         self,

@@ -5,8 +5,7 @@ from blitzdb.fields import BaseField
 
 class ForeignKeyField(BaseField):
 
-    """
-    The ManyToManyProxy should support the following operations:
+    """The ManyToManyProxy should support the following operations:
 
     - Retrieve related documents from the database
     - Append new documents to the relation

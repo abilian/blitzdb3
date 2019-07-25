@@ -107,7 +107,7 @@ class QuerySet(BaseQuerySet):
         if self._it is None:
             self._it = iter(self)
         if six.PY2:
-            return self._it.next()
+            return next(self._it)
 
         return self._it.__next__()
 

@@ -48,8 +48,7 @@ class DotEncoder(object):
 
 class Backend(BaseBackend):
 
-    """
-    A MongoDB backend.
+    """A MongoDB backend.
 
     :param db: An instance of a `pymongo.database.Database <http://api.mongodb.org/python/current/api/pymongo/database.html>`_ class
 
@@ -329,9 +328,8 @@ class Backend(BaseBackend):
 
     def _canonicalize_query(self, query):
 
-        """
-        Transform the query dictionary to replace e.g. documents with __ref__ fields.
-        """
+        """Transform the query dictionary to replace e.g. documents with
+        __ref__ fields."""
 
         def transform_query(q):
 
@@ -395,8 +393,8 @@ class Backend(BaseBackend):
         return queryset[0]
 
     def filter(self, cls_or_collection, query, raw=False, only=None):
-        """
-        Filter objects from the database that correspond to a given set of properties.
+        """Filter objects from the database that correspond to a given set of
+        properties.
 
         See :py:meth:`blitzdb.backends.base.Backend.filter` for documentation of individual parameters
 
@@ -404,7 +402,6 @@ class Backend(BaseBackend):
 
             This function supports most query operators that are available in MongoDB and returns
             a query set that is based on a MongoDB cursor.
-
         """
 
         if not isinstance(cls_or_collection, six.string_types):

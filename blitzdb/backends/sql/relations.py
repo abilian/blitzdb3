@@ -8,9 +8,9 @@ from .queryset import QuerySet
 
 class ManyToManyProxy(object):
 
-    """
-    The ManyToManyProxy transparently handles n:m relationships among different object types.
-    It automatically retrieves related documents from the database and initializes them.
+    """The ManyToManyProxy transparently handles n:m relationships among
+    different object types. It automatically retrieves related documents from
+    the database and initializes them.
 
     From the outside, the behavior corresponds to that of a normal Python list to which we
     can append
@@ -28,7 +28,6 @@ class ManyToManyProxy(object):
     example::
 
         foo = bar
-
     """
 
     def __init__(self, obj, field_name, params, objects=None):
@@ -136,9 +135,7 @@ class ManyToManyProxy(object):
             )
 
     def remove(self, obj):
-        """
-        Remove an object from the relation
-        """
+        """Remove an object from the relation."""
         relationship_table = self.params["relationship_table"]
         with self.obj.backend.transaction(implicit=True):
             condition = and_(

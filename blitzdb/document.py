@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 if six.PY3:
-    unicode = str
+    six.text_type = str
 
 
 class DoesNotExist(BaseException):
@@ -32,9 +32,7 @@ class MultipleDocumentsReturned(BaseException):
 
 class MetaDocument(type):
 
-    """
-    Here we inject class-dependent exceptions into the Document class.
-    """
+    """Here we inject class-dependent exceptions into the Document class."""
 
     def __new__(meta, name, bases, dct):
         sanitized_dct = {}
@@ -89,10 +87,10 @@ document_classes = []
 @six.add_metaclass(MetaDocument)
 class Document(object):
 
-    """
-    The Document object is the base class for all documents stored in the database.
-    The name of the collection can be set by defining a :class:`Document.Meta` class within
-    the class and setting its `collection` attribute.
+    """The Document object is the base class for all documents stored in the
+    database. The name of the collection can be set by defining a
+    :class:`Document.Meta` class within the class and setting its `collection`
+    attribute.
 
     :param attributes: the attributes of the document instance. Expects a Python dictionary.
     :param lazy: if set to `True`, will lazily load the document from the backend when
@@ -134,7 +132,7 @@ class Document(object):
 
       print(fail.delete) #will print <bound method Document.save ...>
 
-      print(fail.attributes['delete']) #will print 'False'
+      print(fail.attributes['delete']) #will print('False')
 
     **Defining "non-database" attributes**
 
@@ -329,8 +327,8 @@ class Document(object):
         return False
 
     def __eq__(self, other):
-        """
-        Compares the document instance to another object. The comparison rules are as follows:
+        """Compares the document instance to another object. The comparison
+        rules are as follows:
 
         * If the Python `id` of the objects are identical, return `True`
         * If the types of the objects differ, return `False`
@@ -363,7 +361,7 @@ class Document(object):
     else:
 
         def __str__(self):
-            return unicode(self).encode("utf-8")
+            return six.text_type(self).encode("utf-8")
 
     def _represent(self, n=1):
 
@@ -392,9 +390,9 @@ class Document(object):
     __repr__ = _represent
 
     def initialize(self):
-        """
-        Gets called when **after** the object attributes get loaded from the database.
-        Redefine it in your document class to perform object initialization tasks.
+        """Gets called when **after** the object attributes get loaded from the
+        database. Redefine it in your document class to perform object
+        initialization tasks.
 
         .. admonition:: Keep in Mind
 
@@ -409,13 +407,14 @@ class Document(object):
         pass
 
     def autogenerate_pk(self):
-        """
-        Autogenerates a primary key for this document. This function gets called by the backend
-        if you save a document without a primary key field. By default, it uses `uuid.uuid4().hex`
-        to generate a (statistically) unique primary key for the object (`more about UUIDs
-        <https://docs.python.org/2/library/uuid.html>`_).
-        If you want to define your own primary key generation mechanism, just redefine this function
-        in your document class.
+        """Autogenerates a primary key for this document. This function gets
+        called by the backend if you save a document without a primary key
+        field. By default, it uses `uuid.uuid4().hex` to generate a
+        (statistically) unique primary key for the object (`more about UUIDs.
+
+        <https://docs.python.org/2/library/uuid.html>`_). If you want to
+        define your own primary key generation mechanism, just redefine
+        this function in your document class.
         """
         self.pk = uuid.uuid4().hex
 
@@ -429,12 +428,12 @@ class Document(object):
 
     @property
     def pk(self):
-        """
-        Returns (or sets) the primary key of the document, which is stored in the `attributes` dict
-        along with all other attributes. The name of the primary key defaults to `pk` and
-        can be redefine in the `Meta` class. This function provides a standardized way to
-        retrieve and set the primary key of a document and is used by the backend and a
-        few other classes. If possible, always use this function to access the
+        """Returns (or sets) the primary key of the document, which is stored
+        in the `attributes` dict along with all other attributes. The name of
+        the primary key defaults to `pk` and can be redefine in the `Meta`
+        class. This function provides a standardized way to retrieve and set
+        the primary key of a document and is used by the backend and a few
+        other classes. If possible, always use this function to access the
         primary key of a document.
 
         .. admonition:: Automatic primary key generation
@@ -443,7 +442,6 @@ class Document(object):
             Blitz will create a default primary-key by calling the `autogenerate_pk` function
             of the document. To generate your own primary keys, just redefine this function
             in your derived document class.
-
         """
         primary_key = self.get_pk_name()
         if primary_key in self._attributes:
@@ -478,13 +476,12 @@ class Document(object):
         self._backend = backend
 
     def save(self, backend=None):
-        """
-        Saves a document to the database. If the `backend` argument is not specified,
-        the function resorts to the *default backend* as defined during object instantiation.
-        If no such backend is defined, an `AttributeError` exception will be thrown.
+        """Saves a document to the database. If the `backend` argument is not
+        specified, the function resorts to the *default backend* as defined
+        during object instantiation. If no such backend is defined, an
+        `AttributeError` exception will be thrown.
 
         :param backend: the backend in which to store the document.
-
         """
         if not backend:
             if not self._backend:
@@ -496,13 +493,12 @@ class Document(object):
         return backend.save(self)
 
     def delete(self, backend=None):
-        """
-        Deletes a document from the database. If the `backend` argument is not specified,
-        the function resorts to the *default backend* as defined during object instantiation.
-        If no such backend is defined, an `AttributeError` exception will be thrown.
+        """Deletes a document from the database. If the `backend` argument is
+        not specified, the function resorts to the *default backend* as defined
+        during object instantiation. If no such backend is defined, an
+        `AttributeError` exception will be thrown.
 
         :param backend: the backend from which to delete the document.
-
         """
         if not backend:
             if not self._backend:
@@ -513,11 +509,10 @@ class Document(object):
         backend.delete(self)
 
     def revert(self, backend=None, implicit=False):
-        """
-        Reverts the state of the document to that contained in the database.
-        If the `backend` argument is not specified, the function resorts to the *default backend*
-        as defined during object instantiation. If no such backend is defined, an `AttributeError`
-        exception will be thrown.
+        """Reverts the state of the document to that contained in the database.
+        If the `backend` argument is not specified, the function resorts to the
+        *default backend* as defined during object instantiation. If no such
+        backend is defined, an `AttributeError` exception will be thrown.
 
         :param backend: the backend from which to delete the document.
         :param implicit: whether the loading was triggered implicitly (e.g. by accessing attributes)
@@ -526,7 +521,6 @@ class Document(object):
 
             This function will call the `initialize` function after loading the object, which
             allows you to perform document-specific initialization tasks if needed.
-
         """
         if implicit and not self._autoload:
             logger.debug(

@@ -5,6 +5,7 @@ import operator
 import re
 
 import six
+from six.moves import reduce
 
 if six.PY3:
     from functools import reduce

@@ -11,7 +11,7 @@ from .serializers import PickleSerializer as Serializer
 
 
 class NonUnique(BaseException):
-    """Index uniqueness constraint violated"""
+    """Index uniqueness constraint violated."""
 
     pass
 
@@ -31,7 +31,6 @@ class Index(object):
     :type deserializer: object
     :param store: Where the blobs are stored
     :type store: object
-
     """
 
     def __init__(self, params, serializer, deserializer, store=None, unique=False):
@@ -71,7 +70,6 @@ class Index(object):
 
         :return: primary key
         :rtype: str
-
         """
         return self._params["key"]
 
@@ -82,7 +80,6 @@ class Index(object):
         :type attributes: dict
         :return: Value to be indexed
         :rtype: object
-
         """
 
         value = attributes
@@ -105,7 +102,6 @@ class Index(object):
         """Save index to store.
 
         :raise AttributeError: If no datastore is defined
-
         """
         if not self._store:
             raise AttributeError("No datastore defined!")
@@ -119,7 +115,6 @@ class Index(object):
 
         :return: All keys
         :rtype: list(str)
-
         """
         all_keys = []
         for keys in self._index.values():
@@ -131,7 +126,6 @@ class Index(object):
 
         :return: Internal index structure
         :rtype: dict(str)
-
         """
         return copy.deepcopy(self._index)
 
@@ -141,7 +135,6 @@ class Index(object):
         :return: Whether index was correctly loaded or not
         :rtype: bool
         :raise AttributeError: If no datastore is defined
-
         """
         if not self._store:
             raise AttributeError("No datastore defined!")
@@ -172,7 +165,6 @@ class Index(object):
         :return: Sorted keys
         :rtype: list(str)
         :raise ValueError: If invalid order value is passed
-
         """
         # to do: check that all reverse index values are unambiguous
         missing_keys = [key for key in keys if not len(self._reverse_index[key])]
@@ -205,7 +197,6 @@ class Index(object):
         :type in_place: bool
         :return: Index data structure
         :rtype: list
-
         """
         if in_place:
             return [list(self._index.items()), list(self._undefined_keys.keys())]
@@ -220,7 +211,6 @@ class Index(object):
 
         :param with_undefined: Load undefined keys as well
         :type with_undefined: bool
-
         """
         if with_undefined:
             defined_values, undefined_values = data
@@ -244,7 +234,6 @@ class Index(object):
         :type value: object
         :return: Hashed value
         :rtype: str
-
         """
         if isinstance(value, dict) and "__ref__" in value:
             return self.get_hash_for(value["__ref__"])
@@ -269,7 +258,6 @@ class Index(object):
         :type value: object
         :return: The keys for the given value
         :rtype: list(str)
-
         """
         if callable(value):
             return value(self)
@@ -282,7 +270,6 @@ class Index(object):
 
         :return: Undefined keys
         :rtype: list(str)
-
         """
         return self._undefined_keys.keys()
 
@@ -295,7 +282,6 @@ class Index(object):
         :type hash_value: str
         :param store_key: The key for the document in the store
         :type store_key: object
-
         """
         if self._unique and hash_value in self._index:
             raise NonUnique("Hash value {} already in index".format(hash_value))
@@ -312,7 +298,6 @@ class Index(object):
         :type attributes: dict(str)
         :param store_key: The key for the document in the store
         :type store_key: str
-
         """
         undefined = False
         try:
@@ -343,7 +328,6 @@ class Index(object):
 
         :param store_key: The key for the document in the store
         :type store_key: str
-
         """
         self._undefined_keys[store_key] = True
 
@@ -352,7 +336,6 @@ class Index(object):
 
         :param store_key: The key for the document in the store
         :type store_key: str
-
         """
         if store_key in self._undefined_keys:
             del self._undefined_keys[store_key]
@@ -387,7 +370,6 @@ class TransactionalIndex(Index):
         """Begin transaction.
 
         This will commit the last transaction before starting a new one.
-
         """
         self.commit()
 
@@ -422,7 +404,6 @@ class TransactionalIndex(Index):
 
         :param store_key: The key for the document in the store
         :type store_key: str
-
         """
         self._undefined_cache[store_key] = True
 
@@ -433,7 +414,6 @@ class TransactionalIndex(Index):
         :type hash_value: str
         :param store_key: The key for the document in the store
         :type store_key: object
-
         """
         if hash_value not in self._add_cache[store_key]:
             self._add_cache[store_key].append(hash_value)
@@ -449,7 +429,6 @@ class TransactionalIndex(Index):
 
         :param store_key: The key for the document in the store
         :type store_key: str
-
         """
         self._remove_cache[store_key] = True
         if store_key in self._add_cache:
@@ -468,7 +447,6 @@ class TransactionalIndex(Index):
         :type include_uncommitted: bool
         :return: The keys for the given value
         :rtype: list(str)
-
         """
         if not include_uncommitted:
             return super(TransactionalIndex, self).get_keys_for(value)

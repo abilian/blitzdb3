@@ -5,8 +5,7 @@ from blitzdb.queryset import QuerySet as BaseQuerySet
 
 class QuerySet(BaseQuerySet):
 
-    """
-    """
+    """"""
 
     def __init__(self, backend, cls, cursor, raw=False, only=None):
         super(QuerySet, self).__init__(backend, cls)
