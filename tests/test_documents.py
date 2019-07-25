@@ -26,7 +26,7 @@ def test_unicode():
 
     doc = Document({"pk": "foo"})
     if six.PY2:
-        assert unicode(str(doc)) == unicode(doc)
+        assert six.text_type(str(doc)) == six.text_type(doc)
     else:
         assert doc.__unicode__ == doc.__str__
 

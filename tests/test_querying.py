@@ -89,7 +89,7 @@ def test_query_set(backend):
 
     queryset = backend.filter(Actor, {"name": "bar", "is_funny": True})
 
-    assert queryset.next() == actors[0]
+    assert next(queryset) == actors[0]
 
 
 def test_and_queries(backend):
