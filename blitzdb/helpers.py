@@ -28,7 +28,7 @@ def get_value(obj, key, create=False):
 
 
 def set_value(obj, key, value, overwrite=True):
-    key_fragments = key.split('.')
+    key_fragments = key.split(".")
     current_dict = obj
     last_dict = None
     last_key = None
@@ -55,7 +55,7 @@ def set_value(obj, key, value, overwrite=True):
 
 
 def delete_value(obj, key):
-    key_fragments = key.split('.')
+    key_fragments = key.split(".")
     current_dict = obj
     last_dict = None
     for key_fragment in key_fragments:

@@ -8,7 +8,7 @@ def test_implicit_transaction(backend):
     backend.init_schema()
     backend.create_schema()
 
-    al_pacino = Actor({'name': 'Al Pacino', 'best_genre': 'action'})
+    al_pacino = Actor({"name": "Al Pacino", "best_genre": "action"})
     # this will be automatically committed
     backend.save(al_pacino)
     assert backend.current_transaction is None
@@ -20,7 +20,7 @@ def test_explicit_transaction(backend):
     backend.init_schema()
     backend.create_schema()
 
-    al_pacino = Actor({'name': 'Al Pacino', 'best_genre': 'action'})
+    al_pacino = Actor({"name": "Al Pacino", "best_genre": "action"})
     # here we explicitly begin a transaction
     transaction = backend.begin()
     backend.save(al_pacino)

@@ -13,4 +13,4 @@ def test_basic_storage(backend):
 
     recovered_movie = backend.get(Movie, {})
 
-    assert 'foo.bar.baz' in recovered_movie and recovered_movie['foo.bar.baz'] == 'bar'
+    assert "foo.bar.baz" in recovered_movie and recovered_movie["foo.bar.baz"] == "bar"

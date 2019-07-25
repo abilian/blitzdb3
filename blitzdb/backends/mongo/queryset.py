@@ -27,8 +27,8 @@ class QuerySet(BaseQuerySet):
         deserialized_attributes = self.backend.deserialize(
             json_attributes, create_instance=False
         )
-        if '_id' in deserialized_attributes:
-            del deserialized_attributes['_id']
+        if "_id" in deserialized_attributes:
+            del deserialized_attributes["_id"]
         return self.backend.create_instance(self.cls, deserialized_attributes)
 
     def as_list(self):
@@ -67,7 +67,7 @@ class QuerySet(BaseQuerySet):
         return obj
 
     def __contains__(self, obj):
-        pks = self._cursor.distinct('_id')
+        pks = self._cursor.distinct("_id")
         if isinstance(obj, list) or isinstance(obj, tuple):
             obj_list = obj
         else:
@@ -82,7 +82,7 @@ class QuerySet(BaseQuerySet):
         self._cursor.rewind()
 
     def delete(self):
-        self.backend.delete_by_primary_keys(self.cls, self._cursor.distinct('_id'))
+        self.backend.delete_by_primary_keys(self.cls, self._cursor.distinct("_id"))
 
     def sort(self, *args, **kwargs):
         self._cursor.sort(*args, **kwargs)
@@ -103,10 +103,8 @@ class QuerySet(BaseQuerySet):
 
     def __eq__(self, other):
         if isinstance(other, QuerySet):
-            if (
-                self.cls == other.cls
-                and set(self._cursor.distinct('_id')) ==
-                set(other._cursor.distinct('_id'))
+            if self.cls == other.cls and set(self._cursor.distinct("_id")) == set(
+                other._cursor.distinct("_id")
             ):
                 return True
 

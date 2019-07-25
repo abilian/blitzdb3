@@ -49,25 +49,27 @@ def test_advanced_transaction(transactional_backend):
     transactional_backend.filter(Movie, {}).delete()
     transactional_backend.rollback()
 
-    movie = Movie({'title': 'The Godfather', 'year': 1979})
+    movie = Movie({"title": "The Godfather", "year": 1979})
     movie.save(transactional_backend)
     transactional_backend.commit()
 
     transactional_backend.begin()
     transactional_backend.delete(movie)
-    movie.title = 'Star Wars IV'
+    movie.title = "Star Wars IV"
     movie.save(transactional_backend)
 
     transactional_backend.rollback()
 
-    assert transactional_backend.get(
-        Movie, {'title': 'The Godfather', 'year': 1979}
-    ).title == 'The Godfather'
+    assert (
+        transactional_backend.get(Movie, {"title": "The Godfather", "year": 1979}).title
+        == "The Godfather"
+    )
 
-    assert transactional_backend.get(
-        Movie, {'title': 'The Godfather', 'year': 1979}
-    ) == movie
-    assert len(transactional_backend.filter(Movie, {'year': 1979})) == 1
+    assert (
+        transactional_backend.get(Movie, {"title": "The Godfather", "year": 1979})
+        == movie
+    )
+    assert len(transactional_backend.filter(Movie, {"year": 1979})) == 1
 
 
 def test_autocommit_transaction(transactional_backend):
@@ -76,18 +78,19 @@ def test_autocommit_transaction(transactional_backend):
 
     try:
         transactional_backend.autocommit = True
-        movie = Movie({'title': 'The Godfather', 'year': 1979})
+        movie = Movie({"title": "The Godfather", "year": 1979})
         movie.save(transactional_backend)
         transactional_backend.delete(movie)
-        movie.title = 'Star Wars IV'
+        movie.title = "Star Wars IV"
         movie.save(transactional_backend)
 
         with pytest.raises(Movie.DoesNotExist):
-            transactional_backend.get(Movie, {'title': 'The Godfather', 'year': 1979})
+            transactional_backend.get(Movie, {"title": "The Godfather", "year": 1979})
 
-        assert transactional_backend.get(
-            Movie, {'title': 'Star Wars IV', 'year': 1979}
-        ) == movie
-        assert len(transactional_backend.filter(Movie, {'year': 1979})) == 1
+        assert (
+            transactional_backend.get(Movie, {"title": "Star Wars IV", "year": 1979})
+            == movie
+        )
+        assert len(transactional_backend.filter(Movie, {"year": 1979})) == 1
     finally:
         transactional_backend.autocommit = False

@@ -72,19 +72,17 @@ class ManyToManyProxy(object):
 
     def get_queryset(self, *args, **kwargs):
         if self._queryset is None:
-            relationship_table = self.params['relationship_table']
+            relationship_table = self.params["relationship_table"]
             foreign_table = self.obj.backend.get_collection_table(
-                self.params['collection']
+                self.params["collection"]
             )
             condition = relationship_table.c[
-                self.params['pk_field_name']
-            ] == expression.cast(
-                self.obj.pk, self.params['type']
-            )
+                self.params["pk_field_name"]
+            ] == expression.cast(self.obj.pk, self.params["type"])
             self._queryset = QuerySet(
                 backend=self.obj.backend,
                 table=foreign_table,
-                cls=self.params['class'],
+                cls=self.params["class"],
                 joins=[(relationship_table,)],
                 condition=condition,
                 objects=self._objects,
@@ -101,20 +99,20 @@ class ManyToManyProxy(object):
             if obj.pk is None:
                 self.obj.backend.save(obj)
 
-            relationship_table = self.params['relationship_table']
+            relationship_table = self.params["relationship_table"]
             condition = and_(
-                relationship_table.c[self.params['related_pk_field_name']] == obj.pk,
-                relationship_table.c[self.params['pk_field_name']] == self.obj.pk,
+                relationship_table.c[self.params["related_pk_field_name"]] == obj.pk,
+                relationship_table.c[self.params["pk_field_name"]] == self.obj.pk,
             )
-            s = select([func.count(text('*'))]).where(condition)
+            s = select([func.count(text("*"))]).where(condition)
             result = self.obj.backend.connection.execute(s)
             cnt = result.first()[0]
             if cnt:
                 return  # the object is already inside
 
             values = {
-                self.params['pk_field_name']: self.obj.pk,
-                self.params['related_pk_field_name']: obj.pk,
+                self.params["pk_field_name"]: self.obj.pk,
+                self.params["related_pk_field_name"]: obj.pk,
             }
             insert = relationship_table.insert().values(**values)
             self.obj.backend.connection.execute(insert)
@@ -128,11 +126,11 @@ class ManyToManyProxy(object):
         raise NotImplementedError
 
     def delete(self):
-        relationship_table = self.params['relationship_table']
+        relationship_table = self.params["relationship_table"]
         with self.obj.backend.transaction(implicit=True):
-            condition = relationship_table.c[
-                self.params['pk_field_name']
-            ] == self.obj.pk
+            condition = (
+                relationship_table.c[self.params["pk_field_name"]] == self.obj.pk
+            )
             self.obj.backend.connection.execute(
                 delete(relationship_table).where(condition)
             )
@@ -141,11 +139,11 @@ class ManyToManyProxy(object):
         """
         Remove an object from the relation
         """
-        relationship_table = self.params['relationship_table']
+        relationship_table = self.params["relationship_table"]
         with self.obj.backend.transaction(implicit=True):
             condition = and_(
-                relationship_table.c[self.params['related_pk_field_name']] == obj.pk,
-                relationship_table.c[self.params['pk_field_name']] == self.obj.pk,
+                relationship_table.c[self.params["related_pk_field_name"]] == obj.pk,
+                relationship_table.c[self.params["pk_field_name"]] == self.obj.pk,
             )
             self.obj.backend.connection.execute(
                 delete(relationship_table).where(condition)

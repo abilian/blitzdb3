@@ -33,7 +33,7 @@ def filter_query(key, expression):
     if (
         isinstance(expression, dict)
         and len(expression) == 1
-        and list(expression.keys())[0].startswith('$')
+        and list(expression.keys())[0].startswith("$")
     ):
         compiled_expression = compile_query(expression)
     elif callable(expression):
@@ -136,7 +136,7 @@ def all_query(expression):
         try:
             iter(ev)
         except TypeError:
-            raise AttributeError('$all argument must be an iterable!')
+            raise AttributeError("$all argument must be an iterable!")
 
         hashed_ev = [index.get_hash_for(v) for v in ev]
         store_keys = set()
@@ -157,7 +157,7 @@ def elemMatch_query(expression):
 
     def _elemMatch(index, expression=expression):
         """Raise exception since this operator is not implemented yet."""
-        raise ValueError('$elemMatch query is currently not supported by file backend!')
+        raise ValueError("$elemMatch query is currently not supported by file backend!")
 
     return _elemMatch
 
@@ -171,7 +171,7 @@ def in_query(expression):
         try:
             iter(ev)
         except TypeError:
-            raise AttributeError('$in argument must be an iterable!')
+            raise AttributeError("$in argument must be an iterable!")
 
         hashed_ev = [index.get_hash_for(v) for v in ev]
         store_keys = set()
@@ -189,9 +189,9 @@ def compile_query(query):
     if isinstance(query, dict):
         expressions = []
         for key, value in query.items():
-            if key.startswith('$'):
+            if key.startswith("$"):
                 if key not in query_funcs:
-                    raise AttributeError('Invalid operator: {}'.format(key))
+                    raise AttributeError("Invalid operator: {}".format(key))
 
                 expressions.append(query_funcs[key](value))
             else:
@@ -201,11 +201,9 @@ def compile_query(query):
 
         else:
             return (
-                expressions[0] if len(
-                    expressions
-                ) else lambda query_function: query_function(
-                    None, None
-                )
+                expressions[0]
+                if len(expressions)
+                else lambda query_function: query_function(None, None)
             )
 
     else:
@@ -213,17 +211,17 @@ def compile_query(query):
 
 
 query_funcs = {
-    '$regex': regex_query,
-    '$exists': exists_query,
-    '$and': boolean_operator_query(operator.and_),
-    '$all': all_query,
-    '$elemMatch': elemMatch_query,
-    '$or': boolean_operator_query(operator.or_),
-    '$gte': comparison_operator_query(operator.ge),
-    '$lte': comparison_operator_query(operator.le),
-    '$gt': comparison_operator_query(operator.gt),
-    '$lt': comparison_operator_query(operator.lt),
-    '$ne': comparison_operator_query(operator.ne),
-    '$not': not_query,
-    '$in': in_query,
+    "$regex": regex_query,
+    "$exists": exists_query,
+    "$and": boolean_operator_query(operator.and_),
+    "$all": all_query,
+    "$elemMatch": elemMatch_query,
+    "$or": boolean_operator_query(operator.or_),
+    "$gte": comparison_operator_query(operator.ge),
+    "$lte": comparison_operator_query(operator.le),
+    "$gt": comparison_operator_query(operator.gt),
+    "$lt": comparison_operator_query(operator.lt),
+    "$ne": comparison_operator_query(operator.ne),
+    "$not": not_query,
+    "$in": in_query,
 }

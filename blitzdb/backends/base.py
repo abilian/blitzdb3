@@ -33,24 +33,22 @@ class InTransaction(BaseException):
 
 
 class ComplexEncoder(object):
-
     @classmethod
     def encode(cls, obj, path):
         if isinstance(obj, complex):
-            return {'_type': 'complex', 'r': obj.real, 'i': obj.imag}
+            return {"_type": "complex", "r": obj.real, "i": obj.imag}
 
         return obj
 
     @classmethod
     def decode(cls, obj):
-        if isinstance(obj, dict) and obj.get('_type') == 'complex':
-            return 1j * obj['i'] + obj['r']
+        if isinstance(obj, dict) and obj.get("_type") == "complex":
+            return 1j * obj["i"] + obj["r"]
 
         return obj
 
 
 class ComplexQueryEncoder(object):
-
     @classmethod
     def encode(cls, obj, path):
         if isinstance(obj, complex):
@@ -112,7 +110,7 @@ class Backend(object):
     def unregister(self, cls):
 
         if cls in self.classes:
-            del self.collections[self.classes[cls]['collection']]
+            del self.collections[self.classes[cls]["collection"]]
             del self.classes[cls]
 
     def register(self, cls, parameters=None, overwrite=False):
@@ -150,9 +148,9 @@ class Backend(object):
 
         if parameters is None:
             parameters = {}
-        if 'collection' in parameters:
-            collection_name = parameters['collection']
-        elif hasattr(cls.Meta, 'collection'):
+        if "collection" in parameters:
+            collection_name = parameters["collection"]
+        elif hasattr(cls.Meta, "collection"):
             collection_name = cls.Meta.collection
         else:
             collection_name = cls.__name__.lower()
@@ -162,14 +160,14 @@ class Backend(object):
         def register_class(collection_name, cls):
             self.collections[collection_name] = cls
             self.classes[cls] = parameters.copy()
-            self.classes[cls]['collection'] = collection_name
+            self.classes[cls]["collection"] = collection_name
 
         if collection_name in self.collections:
             old_cls = self.collections[collection_name]
             if (issubclass(cls, old_cls) and not (cls is old_cls)) or overwrite:
                 logger.warning(
-                    "Replacing class %s with %s for collection %s" %
-                    (old_cls, cls, collection_name)
+                    "Replacing class %s with %s for collection %s"
+                    % (old_cls, cls, collection_name)
                 )
                 self.deprecated_classes[old_cls] = self.classes[old_cls]
                 del self.classes[old_cls]
@@ -186,17 +184,16 @@ class Backend(object):
         return False
 
     def get_meta_attributes(self, cls):
-
         def get_user_attributes(cls):
             if six.PY2:
-                boring = dir(type(b'dummy', (object,), {}))
+                boring = dir(type(b"dummy", (object,), {}))
             else:
-                boring = dir(type('dummy', (object,), {}))
+                boring = dir(type("dummy", (object,), {}))
             return dict(
                 [item for item in inspect.getmembers(cls) if item[0] not in boring]
             )
 
-        if hasattr(cls, 'Meta'):
+        if hasattr(cls, "Meta"):
             params = get_user_attributes(cls.Meta)
         else:
             params = {}
@@ -275,7 +272,7 @@ class Backend(object):
                     return unicode(obj)
 
                 else:
-                    return unicode(str(obj), errors='replace')
+                    return unicode(str(obj), errors="replace")
 
         if isinstance(obj, dict):
             output_obj = {}
@@ -321,9 +318,9 @@ class Backend(object):
                     output_obj = {}
                     if obj.get_pk_name() in output_obj:
                         del output_obj[obj.get_pk_name()]
-                    output_obj['pk'] = obj.pk
-                    output_obj['__collection__'] = self.classes[obj.__class__][
-                        'collection'
+                    output_obj["pk"] = obj.pk
+                    output_obj["__collection__"] = self.classes[obj.__class__][
+                        "collection"
                     ]
                 else:
                     if for_query and not self._allow_documents_in_query:
@@ -331,26 +328,27 @@ class Backend(object):
 
                     if for_query:
                         output_obj = {
-                            '$elemMatch': {
-                                'pk': obj.pk,
-                                '__collection__': self.classes[obj.__class__][
-                                    'collection'
+                            "$elemMatch": {
+                                "pk": obj.pk,
+                                "__collection__": self.classes[obj.__class__][
+                                    "collection"
                                 ],
                             }
                         }
                     else:
                         ref = "%s:%s" % (
-                            self.classes[obj.__class__]['collection'], str(obj.pk)
+                            self.classes[obj.__class__]["collection"],
+                            str(obj.pk),
                         )
                         output_obj = {
-                            '__ref__': ref,
-                            'pk': obj.pk,
-                            '__collection__': self.classes[obj.__class__]['collection'],
+                            "__ref__": ref,
+                            "pk": obj.pk,
+                            "__collection__": self.classes[obj.__class__]["collection"],
                         }
 
                 if (
-                    hasattr(obj, 'Meta')
-                    and hasattr(obj.Meta, 'dbref_includes')
+                    hasattr(obj, "Meta")
+                    and hasattr(obj.Meta, "dbref_includes")
                     and obj.Meta.dbref_includes
                 ):
                     for include_key in obj.Meta.dbref_includes:
@@ -359,7 +357,6 @@ class Backend(object):
                             output_obj[include_key.replace(".", "_")] = value
                         except KeyError:
                             continue
-
 
         else:
             output_obj = obj
@@ -384,22 +381,22 @@ class Backend(object):
         if isinstance(obj, dict):
             if (
                 create_instance
-                and '__collection__' in obj
-                and obj['__collection__'] in self.collections
-                and 'pk' in obj
+                and "__collection__" in obj
+                and obj["__collection__"] in self.collections
+                and "pk" in obj
             ):
                 # for backwards compatibility
                 attributes = copy.deepcopy(obj)
-                del attributes['__collection__']
-                if '__ref__' in attributes:
-                    del attributes['__ref__']
-                if '__lazy__' in attributes:
-                    lazy = attributes['__lazy__']
-                    del attributes['__lazy__']
+                del attributes["__collection__"]
+                if "__ref__" in attributes:
+                    del attributes["__ref__"]
+                if "__lazy__" in attributes:
+                    lazy = attributes["__lazy__"]
+                    del attributes["__lazy__"]
                 else:
                     lazy = True
                 output_obj = self.create_instance(
-                    obj['__collection__'], attributes, lazy=lazy
+                    obj["__collection__"], attributes, lazy=lazy
                 )
             else:
                 output_obj = {}
@@ -431,10 +428,10 @@ class Backend(object):
         :returns: An instance of the requested Document class with the given attributes.
         """
         creation_args = {
-            'backend': self,
-            'autoload': self._autoload_embedded,
-            'lazy': lazy,
-            'db_loader': db_loader,
+            "backend": self,
+            "autoload": self._autoload_embedded,
+            "lazy": lazy,
+            "db_loader": db_loader,
         }
 
         if collection_or_class in self.classes:
@@ -454,15 +451,15 @@ class Backend(object):
         else:
             deserialized_attributes = attributes
 
-        if 'constructor' in self.classes[cls]:
-            obj = self.classes[cls]['constructor'](
+        if "constructor" in self.classes[cls]:
+            obj = self.classes[cls]["constructor"](
                 deserialized_attributes, **creation_args
             )
         else:
             obj = cls(deserialized_attributes, **creation_args)
 
         if call_hook:
-            self.call_hook('after_load', obj)
+            self.call_hook("after_load", obj)
 
         return obj
 
@@ -477,7 +474,6 @@ class Backend(object):
         """
 
         class TransactionManager(object):
-
             def __init__(self, backend, implicit=False):
                 self.backend = backend
                 self.implicit = implicit
@@ -528,7 +524,7 @@ class Backend(object):
             else:
                 raise AttributeError("Unknown object type: %s" % cls.__name__)
 
-        collection = self.classes[cls]['collection']
+        collection = self.classes[cls]["collection"]
         return collection
 
     def get_collection_for_cls_name(self, cls_name):
@@ -541,7 +537,7 @@ class Backend(object):
         """
         for cls in self.classes:
             if cls.__name__ == cls_name:
-                return self.classes[cls]['collection']
+                return self.classes[cls]["collection"]
 
         raise AttributeError("Unknown class name: %s" % cls_name)
 
@@ -554,7 +550,7 @@ class Backend(object):
         :returns: A reference to the class for the given collection name.
         """
         for cls, params in self.classes.items():
-            if params['collection'] == collection:
+            if params["collection"] == collection:
                 return cls
 
         raise AttributeError("Unknown collection: %s" % collection)

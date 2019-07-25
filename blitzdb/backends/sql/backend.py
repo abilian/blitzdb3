@@ -35,7 +35,6 @@ def compile_binary_sqlite(type_, compiler, **kw):
 
 
 class ExcludedFieldsEncoder(object):
-
     def __init__(self, backend, collection):
         self.collection = collection
         self.backend = backend
@@ -78,8 +77,8 @@ class Backend(BaseBackend):
     def __init__(
         self,
         engine,
-        table_postfix='',
-        ondelete='CASCADE',
+        table_postfix="",
+        ondelete="CASCADE",
         create_schema=False,
         **kwargs
     ):
@@ -154,7 +153,7 @@ class Backend(BaseBackend):
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
         try:
-            return self._table_columns[collection][key]['column']
+            return self._table_columns[collection][key]["column"]
 
         except KeyError:
             raise KeyError("Invalid key %s for collection %s" % (key, collection))
@@ -186,7 +185,7 @@ class Backend(BaseBackend):
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
         for column, params in self._index_fields[collection].items():
-            if params['key'] == key:
+            if params["key"] == key:
                 return column
 
         raise KeyError
@@ -213,7 +212,7 @@ class Backend(BaseBackend):
 
         self._relationship_classes = []
         for collection, cls in list(self.collections.items()):
-            if cls.__dict__.get('__abstract__'):
+            if cls.__dict__.get("__abstract__"):
                 # we skip abstract base classes...
                 logger.debug(
                     "Skipping initialization of abstract class {} for collection {}".format(
@@ -225,17 +224,16 @@ class Backend(BaseBackend):
             self.init_class_schema(cls, collection)
 
     def init_class_schema(self, cls, collection, table=None):
-
         def add_one_to_many_field(collection, cls, key, field, backref=None):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related one-to-many field %s of class %s already defined in collection %s by class %s (this might be a problem with a backreference)" %
-                    (
+                    "Related one-to-many field %s of class %s already defined in collection %s by class %s (this might be a problem with a backreference)"
+                    % (
                         key,
                         cls.__name__,
                         collection,
-                        self._related_fields[collection][key]['class'].__name__,
+                        self._related_fields[collection][key]["class"].__name__,
                     )
                 )
 
@@ -245,23 +243,24 @@ class Backend(BaseBackend):
                 related_collection = self.get_collection_for_cls(field.related)
             related_class = self.get_cls_for_collection(related_collection)
             field_name = key
-            column_name = key.replace('.', '_')
+            column_name = key.replace(".", "_")
 
             params = {
-                'field': field,
-                'key': key,
-                'collection': related_collection,
-                'class': related_class,
-                'type': self.get_field_type(cls.Meta.PkType),
-                'is_backref': backref is not None,
-                'backref': backref,
+                "field": field,
+                "key": key,
+                "collection": related_collection,
+                "class": related_class,
+                "type": self.get_field_type(cls.Meta.PkType),
+                "is_backref": backref is not None,
+                "backref": backref,
             }
 
             if backref is None:
-                backref_key = field.backref or 'related_%s_%s' % (
-                    collection, column_name
+                backref_key = field.backref or "related_%s_%s" % (
+                    collection,
+                    column_name,
                 )
-                params['backref'] = add_foreign_key_field(
+                params["backref"] = add_foreign_key_field(
                     related_collection,
                     related_class,
                     backref_key,
@@ -275,12 +274,12 @@ class Backend(BaseBackend):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related foreign key field %s already defined in collection %s (this might be a problem with a backreference)" %
-                    (key, collection)
+                    "Related foreign key field %s already defined in collection %s (this might be a problem with a backreference)"
+                    % (key, collection)
                 )
 
             field_name = key
-            column_name = key.replace('.', '_')
+            column_name = key.replace(".", "_")
             self._excluded_keys[collection][key] = True
             if isinstance(field.related, six.string_types):
                 related_collection = self.get_collection_for_cls_name(field.related)
@@ -291,9 +290,11 @@ class Backend(BaseBackend):
                 column_name,
                 self.get_field_type(related_class.Meta.PkType),
                 ForeignKey(
-                    '%s%s.pk' % (related_collection, self.table_postfix),
-                    name='%s_%s_%s' % (collection, related_collection, column_name),
-                    ondelete=field.ondelete if field.ondelete is not None else self._ondelete,
+                    "%s%s.pk" % (related_collection, self.table_postfix),
+                    name="%s_%s_%s" % (collection, related_collection, column_name),
+                    ondelete=field.ondelete
+                    if field.ondelete is not None
+                    else self._ondelete,
                     use_alter=False,
                 ),
                 index=True,
@@ -301,14 +302,14 @@ class Backend(BaseBackend):
             )
 
             params = {
-                'field': field,
-                'key': key,
-                'column': column_name,
-                'collection': related_collection,
-                'class': related_class,
-                'type': self.get_field_type(related_class.Meta.PkType),
-                'is_backref': backref is not None,
-                'backref': backref,
+                "field": field,
+                "key": key,
+                "column": column_name,
+                "collection": related_collection,
+                "class": related_class,
+                "type": self.get_field_type(related_class.Meta.PkType),
+                "is_backref": backref is not None,
+                "backref": backref,
             }
 
             self._related_fields[collection][field_name] = params
@@ -316,14 +317,15 @@ class Backend(BaseBackend):
             extra_columns.append(column)
 
             if field.unique:
-                name = 'unique_%s_%s' % (collection, column_name)
+                name = "unique_%s_%s" % (collection, column_name)
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
             if backref is None:
-                backref_key = field.backref or 'related_%s_%s' % (
-                    collection, column_name
+                backref_key = field.backref or "related_%s_%s" % (
+                    collection,
+                    column_name,
                 )
-                params['backref'] = add_one_to_many_field(
+                params["backref"] = add_one_to_many_field(
                     related_collection,
                     related_class,
                     backref_key,
@@ -340,12 +342,12 @@ class Backend(BaseBackend):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related many-to-many field %s already defined in collection %s (this might be a problem with a backreference)" %
-                    (key, collection)
+                    "Related many-to-many field %s already defined in collection %s (this might be a problem with a backreference)"
+                    % (key, collection)
                 )
 
             field_name = key
-            column_name = key.replace('.', '_')
+            column_name = key.replace(".", "_")
             self._excluded_keys[collection][key] = True
 
             if isinstance(field.related, six.string_types):
@@ -354,47 +356,53 @@ class Backend(BaseBackend):
                 related_collection = self.get_collection_for_cls(field.related)
             related_class = self.get_cls_for_collection(related_collection)
 
-            pk_field_name = field.field or '%s' % collection
-            related_pk_field_name = field.related_field or '%s' % related_collection
-            if related_pk_field_name == pk_field_name:  # this can happen if we connect a given table with itself
-                related_pk_field_name = related_pk_field_name + '_right'
+            pk_field_name = field.field or "%s" % collection
+            related_pk_field_name = field.related_field or "%s" % related_collection
+            if (
+                related_pk_field_name == pk_field_name
+            ):  # this can happen if we connect a given table with itself
+                related_pk_field_name = related_pk_field_name + "_right"
 
             relationship_name = "%s_%s_%s" % (
-                collection, related_collection, column_name
+                collection,
+                related_collection,
+                column_name,
             )
 
             params = {
-                'field': field,
-                'key': key,
-                'collection': related_collection,
-                'class': related_class,
-                'type': self.get_field_type(related_class.Meta.PkType),
-                'is_backref': True if backref is not None else False,
-                'backref': backref,
-                'pk_field_name': pk_field_name,
-                'related_pk_field_name': related_pk_field_name,
+                "field": field,
+                "key": key,
+                "collection": related_collection,
+                "class": related_class,
+                "type": self.get_field_type(related_class.Meta.PkType),
+                "is_backref": True if backref is not None else False,
+                "backref": backref,
+                "pk_field_name": pk_field_name,
+                "related_pk_field_name": related_pk_field_name,
             }
 
             if backref:
-                relationship_table = backref['relationship_table']
+                relationship_table = backref["relationship_table"]
             else:
                 extra_columns = [
                     UniqueConstraint(
                         pk_field_name,
                         related_pk_field_name,
-                        name='%s_%s_unique' % (relationship_name, column_name),
+                        name="%s_%s_unique" % (relationship_name, column_name),
                     )
                 ]
                 relationship_table = Table(
-                    '%s%s' % (relationship_name, self.table_postfix),
+                    "%s%s" % (relationship_name, self.table_postfix),
                     self._metadata,
                     Column(
                         related_pk_field_name,
                         self.get_field_type(related_class.Meta.PkType),
                         ForeignKey(
-                            '%s%s.pk' % (related_collection, self.table_postfix),
+                            "%s%s.pk" % (related_collection, self.table_postfix),
                             name="%s_%s" % (relationship_name, related_pk_field_name),
-                            ondelete=field.ondelete if field.ondelete is not None else self._ondelete,
+                            ondelete=field.ondelete
+                            if field.ondelete is not None
+                            else self._ondelete,
                             use_alter=False,
                         ),
                         index=True,
@@ -403,9 +411,11 @@ class Backend(BaseBackend):
                         pk_field_name,
                         self.get_field_type(cls.Meta.PkType),
                         ForeignKey(
-                            '%s%s.pk' % (collection, self.table_postfix),
+                            "%s%s.pk" % (collection, self.table_postfix),
                             name="%s_%s" % (relationship_name, pk_field_name),
-                            ondelete=field.ondelete if field.ondelete is not None else self._ondelete,
+                            ondelete=field.ondelete
+                            if field.ondelete is not None
+                            else self._ondelete,
                             use_alter=False,
                         ),
                         index=True,
@@ -413,16 +423,17 @@ class Backend(BaseBackend):
                     *extra_columns
                 )
 
-            params['relationship_table'] = relationship_table
+            params["relationship_table"] = relationship_table
 
             self._relationship_tables[collection][field_name] = relationship_table
             self._related_fields[collection][field_name] = params
 
             if backref is None:
-                backref_key = field.backref or 'related_%s_%s' % (
-                    collection, column_name
+                backref_key = field.backref or "related_%s_%s" % (
+                    collection,
+                    column_name,
                 )
-                params['backref'] = add_many_to_many_field(
+                params["backref"] = add_many_to_many_field(
                     related_collection,
                     related_class,
                     key=backref_key,
@@ -433,7 +444,6 @@ class Backend(BaseBackend):
                 # We add an explicit relationship class for the relationship
 
                 class RelationshipClass(Document):
-
                     class Meta(Document.Meta):
                         autoregister = False
 
@@ -441,8 +451,8 @@ class Backend(BaseBackend):
                     to_class = related_class
 
                 RelationshipClass.__name__ = str(
-                    "%s%s" %
-                    (
+                    "%s%s"
+                    % (
                         collection.capitalize(),
                         "".join(
                             [
@@ -453,14 +463,18 @@ class Backend(BaseBackend):
                     )
                 )
 
-                backref_name_left = '%s_%s_%s' % (
-                    collection, related_collection, column_name
+                backref_name_left = "%s_%s_%s" % (
+                    collection,
+                    related_collection,
+                    column_name,
                 )
-                backref_name_right = '%s_%s_%s' % (
-                    related_collection, collection, column_name
+                backref_name_right = "%s_%s_%s" % (
+                    related_collection,
+                    collection,
+                    column_name,
                 )
                 if backref_name_left == backref_name_right:
-                    backref_name_right += '_right'
+                    backref_name_right += "_right"
                 RelationshipClass.fields[pk_field_name] = ForeignKeyField(
                     cls, backref=backref_name_left, ondelete=self._ondelete
                 )
@@ -476,7 +490,7 @@ class Backend(BaseBackend):
 
                 self.register(
                     RelationshipClass,
-                    parameters={'collection': relationship_name},
+                    parameters={"collection": relationship_name},
                     overwrite=True,
                 )
                 self.init_class_schema(
@@ -487,26 +501,26 @@ class Backend(BaseBackend):
 
         def add_field(collection, key, field):
             self._excluded_keys[collection][key] = True
-            column_name = key.replace('.', '_')
+            column_name = key.replace(".", "_")
             index_params = {
-                'field': field,
-                'key': key,
-                'type': self.get_field_type(
-                    field, name='%s_%s' % (collection, column_name)
+                "field": field,
+                "key": key,
+                "type": self.get_field_type(
+                    field, name="%s_%s" % (collection, column_name)
                 ),
-                'column': column_name,
+                "column": column_name,
             }
             self._index_fields[collection][key] = index_params
             self._table_columns[collection][key] = index_params
             column_args = {
-                'index': field.indexed,
-                'primary_key': field.primary_key,
-                'nullable': field.nullable,
+                "index": field.indexed,
+                "primary_key": field.primary_key,
+                "nullable": field.nullable,
             }
 
             if field.default is not None:
-                column_args['default'] = expression.cast(
-                    field.default, index_params['type']
+                column_args["default"] = expression.cast(
+                    field.default, index_params["type"]
                 )
 
             if field.server_default is not None:
@@ -519,16 +533,16 @@ class Backend(BaseBackend):
                     default_value = expression.literal(default_value)
 
             extra_columns.append(
-                Column(column_name, index_params['type'], **column_args)
+                Column(column_name, index_params["type"], **column_args)
             )
 
             if field.unique:
-                name = 'unique_%s_%s' % (collection, column_name)
+                name = "unique_%s_%s" % (collection, column_name)
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
         # if not primary key field is defined, we add one
-        if not 'pk' in cls.fields:
-            cls.fields['pk'] = cls.Meta.PkType
+        if not "pk" in cls.fields:
+            cls.fields["pk"] = cls.Meta.PkType
 
         extra_columns = []
 
@@ -547,17 +561,17 @@ class Backend(BaseBackend):
             else:
                 add_field(collection, key, field)
 
-        if 'unique_together' in meta_attributes:
-            for keys in meta_attributes['unique_together']:
+        if "unique_together" in meta_attributes:
+            for keys in meta_attributes["unique_together"]:
                 columns = [self.get_column_for_key(collection, key) for key in keys]
-                name = 'unique_together_%s_%s' % (collection, '_'.join(columns))
+                name = "unique_together_%s_%s" % (collection, "_".join(columns))
                 extra_columns.append(UniqueConstraint(*columns, name=name))
 
         if table is None:
             table = Table(
-                '%s%s' % (collection, self.table_postfix),
+                "%s%s" % (collection, self.table_postfix),
                 self._metadata,
-                Column('data', LargeBinary),
+                Column("data", LargeBinary),
                 *extra_columns
             )
         self._collection_tables[collection] = table
@@ -631,12 +645,12 @@ class Backend(BaseBackend):
 
     def delete(self, obj):
 
-        self.call_hook('before_delete', obj)
+        self.call_hook("before_delete", obj)
 
         if obj.pk == None:
             raise obj.DoesNotExist
 
-        self.filter(obj.__class__, {'pk': obj.pk}).delete()
+        self.filter(obj.__class__, {"pk": obj.pk}).delete()
 
     def update(self, obj, set_fields=None, unset_fields=None, update_obj=True):
 
@@ -680,16 +694,16 @@ class Backend(BaseBackend):
         # if we set/unset `github_access_data`, we also set/unset `github_access_data.login` etc...
         for key in self._table_columns[collection]:
             for unset_field in unset_fields:
-                if key.startswith(unset_field + '.') and not key in unset_fields:
+                if key.startswith(unset_field + ".") and not key in unset_fields:
                     unset_fields.append(key)
             for set_field in set_fields.keys():
-                if key.startswith(set_field + '.') and not key in set_fields:
+                if key.startswith(set_field + ".") and not key in set_fields:
                     try:
                         set_fields[key] = get_value(obj, key)
                     except KeyError:
                         set_fields[key] = None
 
-        self.call_hook('before_update', obj, set_fields, unset_fields)
+        self.call_hook("before_update", obj, set_fields, unset_fields)
 
         if update_obj:
             for key, value in set_fields.items():
@@ -703,10 +717,9 @@ class Backend(BaseBackend):
         if not isinstance(unset_fields, (tuple, list)):
             raise TypeError("unset_fields must be a tuple or a list")
 
-
         index_fields = self._index_fields[collection]
         related_fields = self._related_fields[collection]
-        pk_type = self._index_fields[collection]['pk']['type']
+        pk_type = self._index_fields[collection]["pk"]["type"]
 
         deletes = []
         inserts = []
@@ -733,7 +746,7 @@ class Backend(BaseBackend):
                 # we set the value to None to "delete" it from the document.
                 update_dict[key] = None
 
-            update_dict['pk'] = obj.pk
+            update_dict["pk"] = obj.pk
             d = {}
 
             self._serialize_and_update_indexes(
@@ -749,8 +762,8 @@ class Backend(BaseBackend):
                 for_update=True,
             )
 
-            if 'pk' not in set_fields or set_fields['pk'] is None:
-                del d['pk']
+            if "pk" not in set_fields or set_fields["pk"] is None:
+                del d["pk"]
 
             # if we have to update the JSON data
             if data_set_keys or data_unset_keys:
@@ -769,15 +782,15 @@ class Backend(BaseBackend):
                 for key in data_unset_keys:
                     delete_value(data, key)
                 self.connection.execute(
-                    table.update().values(
+                    table.update()
+                    .values(
                         {
-                            'data': expression.cast(
+                            "data": expression.cast(
                                 self.serialize_json(self.serialize(data)), LargeBinary
                             )
                         }
-                    ).where(
-                        table.c.pk == expression.cast(obj.pk, pk_type)
                     )
+                    .where(table.c.pk == expression.cast(obj.pk, pk_type))
                 )
 
             for delete in deletes:
@@ -787,8 +800,10 @@ class Backend(BaseBackend):
                 self.connection.execute(insert)
 
             if d:
-                update = table.update().values(**d).where(
-                    table.c.pk == expression.cast(obj.pk, pk_type)
+                update = (
+                    table.update()
+                    .values(**d)
+                    .where(table.c.pk == expression.cast(obj.pk, pk_type))
                 )
                 result = self.connection.execute(update)
                 if not result.rowcount:
@@ -800,14 +815,14 @@ class Backend(BaseBackend):
         return JsonSerializer.serialize(data)
 
     def deserialize_json(self, data):
-        if data and data != '{}':
+        if data and data != "{}":
             return JsonSerializer.deserialize(data)
 
         return {}
 
     def _serialize_and_update_indexes(self, obj, collection, d, for_update=False):
 
-        pk_type = self._index_fields[collection]['pk']['type']
+        pk_type = self._index_fields[collection]["pk"]["type"]
 
         for index_field, index_params in self._index_fields[collection].items():
             try:
@@ -816,26 +831,26 @@ class Backend(BaseBackend):
                 else:
                     value = get_value(obj, index_field)
                 if value is None:
-                    if not index_params['field'].nullable:
+                    if not index_params["field"].nullable:
                         raise ValueError(
                             "Value for {} is `None`, but this is a mandatory field!".format(
                                 index_field
                             )
                         )
 
-                    d[index_params['column']] = null()
+                    d[index_params["column"]] = null()
                 else:
-                    d[index_params['column']] = expression.cast(
-                        value, index_params['type']
+                    d[index_params["column"]] = expression.cast(
+                        value, index_params["type"]
                     )
 
             except KeyError:
                 if for_update:
                     continue
 
-                if index_params['field'].default is not None:
-                    d[index_params['column']] = index_params['field'].default
-                elif not index_params['field'].nullable:
+                if index_params["field"].default is not None:
+                    d[index_params["column"]] = index_params["field"].default
+                elif not index_params["field"].nullable:
                     raise ValueError(
                         "No value for {} given, but this is a mandatory field!".format(
                             index_field
@@ -843,7 +858,7 @@ class Backend(BaseBackend):
                     )
 
                 else:
-                    d[index_params['column']] = null()
+                    d[index_params["column"]] = null()
 
     def _serialize_and_update_relations(
         self,
@@ -857,12 +872,12 @@ class Backend(BaseBackend):
         save_cache=None,
     ):
 
-        pk_type = self._index_fields[collection]['pk']['type']
+        pk_type = self._index_fields[collection]["pk"]["type"]
 
         for related_field, relation_params in self._related_fields[collection].items():
 
             # we skip back-references...
-            if relation_params.get('is_backref', None):
+            if relation_params.get("is_backref", None):
                 continue
 
             try:
@@ -870,7 +885,7 @@ class Backend(BaseBackend):
                     value = obj[related_field]
                 else:
                     value = get_value(obj, related_field)
-                if isinstance(relation_params['field'], ManyToManyField):
+                if isinstance(relation_params["field"], ManyToManyField):
                     if isinstance(value, ManyToManyProxy):
                         continue
 
@@ -879,8 +894,8 @@ class Backend(BaseBackend):
                     ]
                     deletes.append(
                         relationship_table.delete().where(
-                            relationship_table.c[relation_params['pk_field_name']] ==
-                            expression.cast(obj['pk'], pk_type)
+                            relationship_table.c[relation_params["pk_field_name"]]
+                            == expression.cast(obj["pk"], pk_type)
                         )
                     )
                     for element in value:
@@ -901,18 +916,18 @@ class Backend(BaseBackend):
                             )
 
                         ed = {
-                            relation_params['pk_field_name']: obj['pk'],
-                            relation_params['related_pk_field_name']: element.pk,
+                            relation_params["pk_field_name"]: obj["pk"],
+                            relation_params["related_pk_field_name"]: element.pk,
                         }
                         inserts.append(relationship_table.insert().values(**ed))
-                elif isinstance(relation_params['field'], ForeignKeyField):
+                elif isinstance(relation_params["field"], ForeignKeyField):
                     if value is None:
-                        if not relation_params['field'].nullable:
+                        if not relation_params["field"].nullable:
                             raise AttributeError(
                                 "Field {} cannot be None!".format(related_field)
                             )
 
-                        d[relation_params['column']] = null()
+                        d[relation_params["column"]] = null()
                     elif not isinstance(value, Document):
                         raise AttributeError(
                             "Field {} must be a document!".format(related_field)
@@ -928,22 +943,22 @@ class Backend(BaseBackend):
                                 )
                             )
 
-                        d[relation_params['column']] = expression.cast(
-                            value.pk, relation_params['type']
+                        d[relation_params["column"]] = expression.cast(
+                            value.pk, relation_params["type"]
                         )
 
             except KeyError:
                 if for_update:
                     continue
 
-                if isinstance(relation_params['field'], ForeignKeyField):
-                    if not relation_params['field'].nullable:
+                if isinstance(relation_params["field"], ForeignKeyField):
+                    if not relation_params["field"].nullable:
                         raise ValueError(
-                            "No value for %s given, but this is a mandatory field!" %
-                            relation_params['key']
+                            "No value for %s given, but this is a mandatory field!"
+                            % relation_params["key"]
                         )
 
-                    d[relation_params['column']] = null()
+                    d[relation_params["column"]] = null()
 
     def save(self, obj, autosave_dependent=True, call_hook=True, save_cache=None):
 
@@ -954,11 +969,11 @@ class Backend(BaseBackend):
             raise AttributeError("Trying to save a lazy object!")
 
         if call_hook:
-            self.call_hook('before_save', obj)
+            self.call_hook("before_save", obj)
 
         collection = self.get_collection_for_cls(obj.__class__)
         table = self._collection_tables[collection]
-        pk_type = self._index_fields[collection]['pk']['type']
+        pk_type = self._index_fields[collection]["pk"]["type"]
 
         deletes = []
         inserts = []
@@ -974,7 +989,7 @@ class Backend(BaseBackend):
                     is_insert = True
 
                 d = {
-                    'data': expression.cast(
+                    "data": expression.cast(
                         self.serialize_json(
                             self.serialize(
                                 obj.attributes,
@@ -983,7 +998,7 @@ class Backend(BaseBackend):
                         ),
                         LargeBinary,
                     ),
-                    'pk': expression.cast(obj.pk, pk_type),
+                    "pk": expression.cast(obj.pk, pk_type),
                 }
 
                 self._serialize_and_update_indexes(obj, collection, d)
@@ -1000,10 +1015,11 @@ class Backend(BaseBackend):
                 # if we got an object with a PK, we try to perform an UPDATE operation
 
                 if not is_insert:
-                    update = self._collection_tables[collection].update().values(
-                        **d
-                    ).where(
-                        table.c.pk == obj.pk
+                    update = (
+                        self._collection_tables[collection]
+                        .update()
+                        .values(**d)
+                        .where(table.c.pk == obj.pk)
                     )
                     result = self.connection.execute(update)
 
@@ -1038,7 +1054,7 @@ class Backend(BaseBackend):
 
         collection = self.get_collection_for_cls(obj.__class__)
         for key, params in self._related_fields[collection].items():
-            if isinstance(params['field'], ManyToManyField):
+            if isinstance(params["field"], ManyToManyField):
                 try:
                     # to do: add proper select condition
                     objects = get_value(data, key)
@@ -1049,7 +1065,7 @@ class Backend(BaseBackend):
 
                 # check if we have data for this ManyToMany proxy. If yes, pass it along!
                 set_value(data, key, ManyToManyProxy(obj, key, params, objects=objects))
-            elif isinstance(params['field'], ForeignKeyField):
+            elif isinstance(params["field"], ForeignKeyField):
                 # check if we have data for this ForeignKey object. If yes, pass it along!
                 try:
                     foreign_key_data = get_value(data, key)
@@ -1065,14 +1081,14 @@ class Backend(BaseBackend):
                 if foreign_key_data:
                     if not isinstance(foreign_key_data, dict):
                         foreign_key_data = {
-                            'pk': foreign_key_data,
-                            '__lazy__': True,
-                            '__collection__': collection,
+                            "pk": foreign_key_data,
+                            "__lazy__": True,
+                            "__collection__": collection,
                         }
                     try:
                         d, lazy_foreign_obj = self.deserialize_db_data(foreign_key_data)
                         foreign_obj = self.create_instance(
-                            params['class'], d, lazy=lazy_foreign_obj
+                            params["class"], d, lazy=lazy_foreign_obj
                         )
                     except:
                         logger.warning(
@@ -1085,7 +1101,7 @@ class Backend(BaseBackend):
                 else:  # the data is empty, so there is no foreign object...
                     foreign_obj = None
                 set_value(data, key, foreign_obj)
-            elif isinstance(params['field'], OneToManyField):
+            elif isinstance(params["field"], OneToManyField):
                 try:
                     objects = get_value(data, key)
                 except KeyError:
@@ -1094,22 +1110,22 @@ class Backend(BaseBackend):
                     continue  # already initialized
 
                 # if we don't have the primary key of the object we can't initialize the relation
-                if not 'pk' in data:
+                if not "pk" in data:
                     set_value(data, key, None)
                     continue
 
-                table = self._collection_tables[params['collection']]
-                related_table = self._collection_tables[params['backref']['collection']]
+                table = self._collection_tables[params["collection"]]
+                related_table = self._collection_tables[params["backref"]["collection"]]
                 qs = QuerySet(
                     backend=self,
                     table=table,
-                    cls=params['class'],
-                    condition=table.c[params['backref']['column']] ==
-                    expression.cast(data['pk'], params['type']),
+                    cls=params["class"],
+                    condition=table.c[params["backref"]["column"]]
+                    == expression.cast(data["pk"], params["type"]),
                     objects=objects,
                     raw=False,
                 )
-                if params['field'].unique:
+                if params["field"].unique:
                     # objects will be None if no relationship data was fetched from the DB
                     # if data was fetched but no object was found, objects will be []
                     if objects is not None:
@@ -1123,10 +1139,10 @@ class Backend(BaseBackend):
                             try:
                                 obj = qs[0]
                             except IndexError:
-                                raise params['class'].DoesNotExist
+                                raise params["class"].DoesNotExist
 
                             if len(qs) > 1:
-                                raise params['class'].MultipleDocumentsReturned
+                                raise params["class"].MultipleDocumentsReturned
 
                             return obj
 
@@ -1134,7 +1150,7 @@ class Backend(BaseBackend):
                             data,
                             key,
                             self.create_instance(
-                                params['class'], {}, lazy=True, db_loader=db_loader
+                                params["class"], {}, lazy=True, db_loader=db_loader
                             ),
                         )
                 else:
@@ -1147,28 +1163,28 @@ class Backend(BaseBackend):
         collection = self.get_collection_for_cls(cls)
 
         include_params = {
-            'joins': {},
-            'fields': {},
-            'lazy': False,
-            'collection': collection,
-            'table': self._collection_tables[collection],
+            "joins": {},
+            "fields": {},
+            "lazy": False,
+            "collection": collection,
+            "table": self._collection_tables[collection],
         }
 
         include_list = [include_params]
 
         def include_related_field(d, key, params):
-            if not key in d['joins']:
-                d['joins'][key] = {
-                    'relation': params,
-                    'table': self._collection_tables[params['collection']],
-                    'collection': params['collection'],
-                    'joins': {},
-                    'fields': {},
+            if not key in d["joins"]:
+                d["joins"][key] = {
+                    "relation": params,
+                    "table": self._collection_tables[params["collection"]],
+                    "collection": params["collection"],
+                    "joins": {},
+                    "fields": {},
                 }
-                include_list.append(d['joins'][key])
+                include_list.append(d["joins"][key])
 
         def include_indexed_field(d, key, params):
-            d['fields'][key] = params['column']
+            d["fields"][key] = params["column"]
 
         def resolve_include(include, collection, d, path=None):
             if path is None:
@@ -1197,7 +1213,7 @@ class Backend(BaseBackend):
                     include_related_field(d, key, params)
                 for key, params in self._index_fields[collection].items():
                     include_indexed_field(d, key, params)
-                d['fields']['__data__'] = 'data'
+                d["fields"]["__data__"] = "data"
             else:
                 for key, params in self._related_fields[collection].items():
                     if main_include == key:
@@ -1205,7 +1221,7 @@ class Backend(BaseBackend):
                         if sub_includes:
                             for sub_include in sub_includes:
                                 resolve_include(
-                                    sub_include, params['collection'], d['joins'][key]
+                                    sub_include, params["collection"], d["joins"][key]
                                 )
                         break
 
@@ -1226,33 +1242,34 @@ class Backend(BaseBackend):
                             include_indexed_field(d, key, params)
                             break
 
-                        elif key.startswith(main_include + '.'):
+                        elif key.startswith(main_include + "."):
                             include_indexed_field(d, key, params)
                     else:
-                        d['fields']['__data__'] = 'data'
+                        d["fields"]["__data__"] = "data"
 
         for include in includes:
             resolve_include(include, collection, include_params)
 
         for i, include in enumerate(include_list):
-            if not include['fields']:
-                include['fields']['__data__'] = 'data'
-                include['lazy'] = False
-                for key, params in self._table_columns[include['collection']].items():
+            if not include["fields"]:
+                include["fields"]["__data__"] = "data"
+                include["lazy"] = False
+                for key, params in self._table_columns[include["collection"]].items():
                     if i == 0 and key in excludes:
-                        include['lazy'] = True
+                        include["lazy"] = True
                         continue
 
-                    include['fields'][key] = params['column']
+                    include["fields"][key] = params["column"]
             else:
-                if not 'pk' in include['fields']:
-                    include['fields']['pk'] = 'pk'
-                if len(include['fields']) < len(
-                    self._index_fields[include['collection']]
-                ) + 1:
-                    include['lazy'] = True
+                if not "pk" in include["fields"]:
+                    include["fields"]["pk"] = "pk"
+                if (
+                    len(include["fields"])
+                    < len(self._index_fields[include["collection"]]) + 1
+                ):
+                    include["lazy"] = True
                 else:
-                    include['lazy'] = False
+                    include["lazy"] = False
 
         # we add the order_by_keys seperately
         # (these should not influence whether a document is fetched lazily or not)
@@ -1272,10 +1289,10 @@ class Backend(BaseBackend):
 
         data = {}
         for field_name, params in self._index_fields[collection].items():
-            if not params['column'] in attributes:
+            if not params["column"] in attributes:
                 incomplete = True
             else:
-                set_value(data, params['key'], attributes[params['column']])
+                set_value(data, params["key"], attributes[params["column"]])
 
         return data, incomplete
 
@@ -1283,24 +1300,24 @@ class Backend(BaseBackend):
         if not isinstance(data, dict):
             raise TypeError
 
-        if not '__lazy__' in data:
+        if not "__lazy__" in data:
             raise AttributeError("__lazy__ attribute not specified!")
 
-        if not '__collection__' in data:
+        if not "__collection__" in data:
             raise AttributeError("__collection__ attribute not specified!")
 
-        lazy = data['__lazy__']
-        collection = data['__collection__']
+        lazy = data["__lazy__"]
+        collection = data["__collection__"]
 
-        if '__data__' in data and data['__data__']:
-            d = self.deserialize_json(data['__data__'])
+        if "__data__" in data and data["__data__"]:
+            d = self.deserialize_json(data["__data__"])
             # We delete excluded key values from the data, so that no poisoning can take place...
             for key in self._excluded_keys[collection]:
                 delete_value(d, key)
         else:
             d = {}
         for key, value in data.items():
-            if key in ('__data__', '__lazy__', '__collection__'):
+            if key in ("__data__", "__lazy__", "__collection__"):
                 continue
 
             set_value(d, key, value)
@@ -1329,7 +1346,7 @@ class Backend(BaseBackend):
         # then, we deserialize the attributes and assign them to the object
         obj.attributes = self.deserialize(attributes)
         # finally, we call the after_load hook
-        self.call_hook('after_load', obj)
+        self.call_hook("after_load", obj)
 
         return obj
 
@@ -1402,34 +1419,34 @@ class Backend(BaseBackend):
 
             where_statements = []
 
-            if any(key.startswith('$') for key in query.keys()):
+            if any(key.startswith("$") for key in query.keys()):
                 # this is a special operator query
                 if len(query) > 1:
-                    raise AttributeError('Currently not supported!')
+                    raise AttributeError("Currently not supported!")
 
                 operator = list(query.keys())[0][1:]
-                if not operator in ('and', 'or', 'not'):
+                if not operator in ("and", "or", "not"):
                     raise AttributeError(
                         "Non-supported logical operator: $%s" % operator
                     )
 
-                if operator in ('and', 'or'):
+                if operator in ("and", "or"):
                     where_statements = [
                         sq
-                        for expr in query['$%s' % operator]
+                        for expr in query["$%s" % operator]
                         for sq in compile_query(collection, expr, path=path)
                     ]
-                    if operator == 'and':
+                    if operator == "and":
                         return [and_(*where_statements)]
 
                     else:
                         return [or_(*where_statements)]
 
-                elif operator == 'not':
+                elif operator == "not":
                     return [
                         not_(
                             *compile_query(
-                                collection, query['$not'], table=table, path=path
+                                collection, query["$not"], table=table, path=path
                             )
                         )
                     ]
@@ -1437,7 +1454,6 @@ class Backend(BaseBackend):
             def compile_one_to_many_query(
                 key, query, field_name, related_table, count_column, path
             ):
-
                 def prepare_subquery(tail, query_dict):
                     d = {}
                     if not tail:
@@ -1452,29 +1468,29 @@ class Backend(BaseBackend):
                                 "Performing a query without a primary key!"
                             )
 
-                        return {'pk': query_dict.pk}
+                        return {"pk": query_dict.pk}
 
                     return {tail: query_dict}
 
-                tail = key[len(field_name) + 1:]
+                tail = key[len(field_name) + 1 :]
 
                 if isinstance(query, Document) and not tail:
-                    query = {'pk': query.pk}
+                    query = {"pk": query.pk}
 
                 # to do: implement $size and $not: {$size} operators...
-                if isinstance(query, dict) and len(query) == 1 and list(query.keys())[
-                    0
-                ] in (
-                    '$all', '$in', '$elemMatch', '$nin'
+                if (
+                    isinstance(query, dict)
+                    and len(query) == 1
+                    and list(query.keys())[0] in ("$all", "$in", "$elemMatch", "$nin")
                 ):
                     # this is an $in/$all/$nin query
                     query_type = list(query.keys())[0][1:]
                     subquery = list(query.values())[0]
 
-                    if query_type == 'elemMatch':
+                    if query_type == "elemMatch":
                         queries = compile_query(
-                            params['collection'],
-                            prepare_subquery(tail, query['$elemMatch']),
+                            params["collection"],
+                            prepare_subquery(tail, query["$elemMatch"]),
                             table=related_table,
                             path=path,
                         )
@@ -1486,7 +1502,7 @@ class Backend(BaseBackend):
                                 # this query has a tail
                                 query = {tail: query}
                                 queries = compile_query(
-                                    params['collection'],
+                                    params["collection"],
                                     query,
                                     table=related_table,
                                     path=path,
@@ -1498,20 +1514,20 @@ class Backend(BaseBackend):
                                 qs = subquery.get_queryset()
                             else:
                                 qs = subquery
-                            if not query_type in ('in', 'nin', 'all'):
+                            if not query_type in ("in", "nin", "all"):
                                 raise AttributeError
 
-                            if query_type == 'all':
-                                op = 'in'
+                            if query_type == "all":
+                                op = "in"
                             else:
                                 op = query_type
-                            if query_type == 'all':
+                            if query_type == "all":
                                 cnt = func.count(count_column)
                                 condition = cnt == qs.get_count_select()
                                 havings.append(condition)
                             return [
-                                getattr(related_table.c['pk'], op + '_')(
-                                    qs.get_select(columns=['pk'])
+                                getattr(related_table.c["pk"], op + "_")(
+                                    qs.get_select(columns=["pk"])
                                 )
                             ]
 
@@ -1520,14 +1536,14 @@ class Backend(BaseBackend):
                                 subquery
                                 and isinstance(subquery[0], dict)
                                 and len(subquery[0]) == 1
-                                and list(subquery[0].keys())[0] == '$elemMatch'
+                                and list(subquery[0].keys())[0] == "$elemMatch"
                             ):
                                 queries = [
                                     sq
                                     for v in subquery
                                     for sq in compile_query(
-                                        params['collection'],
-                                        prepare_subquery(tail, v['$elemMatch']),
+                                        params["collection"],
+                                        prepare_subquery(tail, v["$elemMatch"]),
                                         table=related_table,
                                         path=path,
                                     )
@@ -1537,7 +1553,7 @@ class Backend(BaseBackend):
                                     sq
                                     for v in subquery
                                     for sq in compile_query(
-                                        params['collection'],
+                                        params["collection"],
                                         prepare_subquery(tail, v),
                                         table=related_table,
                                         path=path,
@@ -1545,10 +1561,10 @@ class Backend(BaseBackend):
                                 ]
                             where_statement = or_(*queries)
 
-                            if query_type == 'nin':
+                            if query_type == "nin":
                                 where_statement = not_(where_statement)
 
-                            if query_type == 'all' and len(queries) > 1:
+                            if query_type == "all" and len(queries) > 1:
                                 cnt = func.count(count_column)
                                 havings.append(cnt == len(queries))
 
@@ -1561,7 +1577,7 @@ class Backend(BaseBackend):
 
                 else:
                     return compile_query(
-                        params['collection'],
+                        params["collection"],
                         prepare_subquery(tail, query),
                         table=related_table,
                         path=path,
@@ -1571,7 +1587,7 @@ class Backend(BaseBackend):
                 key, value, field_name, params, relationship_table, path
             ):
 
-                related_collection = params['collection']
+                related_collection = params["collection"]
                 related_table = self._collection_tables[related_collection]
 
                 path_str = ".".join(path)
@@ -1584,8 +1600,8 @@ class Backend(BaseBackend):
                     joins_list.append(
                         (
                             relationship_table_alias,
-                            relationship_table_alias.c[params['pk_field_name']] ==
-                            table.c['pk'],
+                            relationship_table_alias.c[params["pk_field_name"]]
+                            == table.c["pk"],
                         )
                     )
 
@@ -1597,10 +1613,8 @@ class Backend(BaseBackend):
                     joins_list.append(
                         (
                             related_table_alias,
-                            relationship_table_alias.c[
-                                params['related_pk_field_name']
-                            ] ==
-                            related_table_alias.c['pk'],
+                            relationship_table_alias.c[params["related_pk_field_name"]]
+                            == related_table_alias.c["pk"],
                         )
                     )
 
@@ -1609,98 +1623,99 @@ class Backend(BaseBackend):
                     value,
                     field_name,
                     related_table_alias,
-                    relationship_table_alias.c[params['pk_field_name']],
+                    relationship_table_alias.c[params["pk_field_name"]],
                     new_path,
                 )
 
             def prepare_special_query(field_name, params, query):
-
                 def sanitize(value):
                     if isinstance(value, (list, tuple)):
                         return [v.pk if isinstance(v, Document) else v for v in value]
 
                     return value
 
-                column_name = params['column']
-                if '$not' in query:
+                column_name = params["column"]
+                if "$not" in query:
                     return [
                         not_(
                             *prepare_special_query(
-                                column_name, params, sanitize(query['$not'])
+                                column_name, params, sanitize(query["$not"])
                             )
                         )
                     ]
 
-                elif '$in' in query:
-                    if not query['$in']:
+                elif "$in" in query:
+                    if not query["$in"]:
                         # we return an impossible condition since the $in query does not contain any values
                         return [
-                            expression.cast(True, Boolean) ==
-                            expression.cast(False, Boolean)
+                            expression.cast(True, Boolean)
+                            == expression.cast(False, Boolean)
                         ]
 
-                    return [table.c[column_name].in_(sanitize(query['$in']))]
+                    return [table.c[column_name].in_(sanitize(query["$in"]))]
 
-                elif '$nin' in query:
-                    if not query['$nin']:
+                elif "$nin" in query:
+                    if not query["$nin"]:
                         return [
-                            expression.cast(True, Boolean) ==
-                            expression.cast(False, Boolean)
+                            expression.cast(True, Boolean)
+                            == expression.cast(False, Boolean)
                         ]
 
-                    return [~table.c[column_name].in_(sanitize(query['$nin']))]
+                    return [~table.c[column_name].in_(sanitize(query["$nin"]))]
 
-                elif '$eq' in query:
-                    return [table.c[column_name] == sanitize(query['$eq'])]
+                elif "$eq" in query:
+                    return [table.c[column_name] == sanitize(query["$eq"])]
 
-                elif '$ne' in query:
-                    return [table.c[column_name] != sanitize(query['$ne'])]
+                elif "$ne" in query:
+                    return [table.c[column_name] != sanitize(query["$ne"])]
 
-                elif '$gt' in query:
-                    return [table.c[column_name] > sanitize(query['$gt'])]
+                elif "$gt" in query:
+                    return [table.c[column_name] > sanitize(query["$gt"])]
 
-                elif '$gte' in query:
-                    return [table.c[column_name] >= sanitize(query['$gte'])]
+                elif "$gte" in query:
+                    return [table.c[column_name] >= sanitize(query["$gte"])]
 
-                elif '$lt' in query:
-                    return [table.c[column_name] < sanitize(query['$lt'])]
+                elif "$lt" in query:
+                    return [table.c[column_name] < sanitize(query["$lt"])]
 
-                elif '$lte' in query:
-                    return [table.c[column_name] <= sanitize(query['$lte'])]
+                elif "$lte" in query:
+                    return [table.c[column_name] <= sanitize(query["$lte"])]
 
-                elif '$exists' in query:
-                    if query['$exists']:
+                elif "$exists" in query:
+                    if query["$exists"]:
                         return [table.c[column_name] != None]
 
                     else:
                         return [table.c[column_name] == None]
 
-                elif '$like' in query:
+                elif "$like" in query:
                     return [
                         table.c[column_name].like(
-                            expression.cast(query['$like'], String)
+                            expression.cast(query["$like"], String)
                         )
                     ]
 
-                elif '$ilike' in query:
+                elif "$ilike" in query:
                     return [
                         table.c[column_name].ilike(
-                            expression.cast(query['$ilike'], String)
+                            expression.cast(query["$ilike"], String)
                         )
                     ]
 
-                elif '$regex' in query:
+                elif "$regex" in query:
                     if not self.engine.url.drivername in (
-                        'postgres', 'mysql', 'sqlite'
+                        "postgres",
+                        "mysql",
+                        "sqlite",
                     ):
                         raise AttributeError(
-                            "Regex queries not supported with %s engine!" %
-                            self.engine.url.drivername
+                            "Regex queries not supported with %s engine!"
+                            % self.engine.url.drivername
                         )
 
                     return [
-                        table.c[column_name].op('REGEXP')(
-                            expression.cast(query['$regex'], String)
+                        table.c[column_name].op("REGEXP")(
+                            expression.cast(query["$regex"], String)
                         )
                     ]
 
@@ -1712,7 +1727,7 @@ class Backend(BaseBackend):
                 for field_name, params in self._index_fields[collection].items():
                     if key == field_name:
                         if isinstance(value, re._pattern_type):
-                            value = {'$regex': value.pattern}
+                            value = {"$regex": value.pattern}
                         if isinstance(value, dict):
                             # this is a special query
                             where_statements.extend(
@@ -1721,8 +1736,8 @@ class Backend(BaseBackend):
                         else:
                             # this is a normal value query
                             where_statements.append(
-                                table.c[params['column']] ==
-                                expression.cast(value, params['type'])
+                                table.c[params["column"]]
+                                == expression.cast(value, params["type"])
                             )
                         break
 
@@ -1731,18 +1746,17 @@ class Backend(BaseBackend):
                     for field_name, params in self._related_fields[collection].items():
                         if key.startswith(field_name):
 
-                            head, tail = key[:len(field_name)], key[
-                                len(field_name) + 1:
-                            ]
+                            head, tail = (
+                                key[: len(field_name)],
+                                key[len(field_name) + 1 :],
+                            )
                             new_path = path + [head]
                             path_str = ".".join(new_path)
                             # ManyToManyField
-                            if isinstance(params['field'], ManyToManyField):
+                            if isinstance(params["field"], ManyToManyField):
                                 relationship_table = self._relationship_tables[
                                     collection
-                                ][
-                                    field_name
-                                ]
+                                ][field_name]
                                 where_statements.extend(
                                     compile_many_to_many_query(
                                         key,
@@ -1754,14 +1768,14 @@ class Backend(BaseBackend):
                                     )
                                 )
                             elif isinstance(
-                                params['field'], ForeignKeyField
+                                params["field"], ForeignKeyField
                             ):  # this is a normal ForeignKey relation
                                 if key == field_name:
                                     # this is a ForeignKey query
                                     if isinstance(value, dict):
                                         if len(value) == 1:
                                             key, query = list(value.items())[0]
-                                            if key == '$exists':
+                                            if key == "$exists":
                                                 if not isinstance(query, bool):
                                                     raise AttributeError(
                                                         "$exists operator requires a Boolean operator"
@@ -1769,17 +1783,17 @@ class Backend(BaseBackend):
 
                                                 if query:
                                                     where_statements.append(
-                                                        table.c[params['column']] !=
-                                                        None
+                                                        table.c[params["column"]]
+                                                        != None
                                                     )
                                                 else:
                                                     where_statements.append(
-                                                        table.c[params['column']] ==
-                                                        None
+                                                        table.c[params["column"]]
+                                                        == None
                                                     )
                                                 break
 
-                                            elif not key in ('$in', '$nin'):
+                                            elif not key in ("$in", "$nin"):
                                                 raise AttributeError("Invalid query!")
 
                                             query_type = key[1:]
@@ -1787,10 +1801,10 @@ class Backend(BaseBackend):
                                             raise AttributeError("Invalid query!")
 
                                     else:
-                                        query_type = 'exact'
+                                        query_type = "exact"
                                         query = value
                                     if isinstance(query, (QuerySet, ManyToManyProxy)):
-                                        if not query_type in ('in', 'nin'):
+                                        if not query_type in ("in", "nin"):
                                             raise AttributeError(
                                                 "QuerySet/ManyToManyProxy objects must be used "
                                                 "in conjunction with $in/$nin when querying a "
@@ -1806,19 +1820,17 @@ class Backend(BaseBackend):
                                                 "$in/$nin query with empty QuerySet/ManyToManyProxy!"
                                             )
 
-                                        if qs.cls is not params['class']:
+                                        if qs.cls is not params["class"]:
                                             raise AttributeError(
                                                 "Invalid QuerySet class!"
                                             )
 
                                         condition = getattr(
-                                            table.c[params['column']], query_type + '_'
-                                        )(
-                                            qs.get_select(columns=['pk'])
-                                        )
+                                            table.c[params["column"]], query_type + "_"
+                                        )(qs.get_select(columns=["pk"]))
                                         where_statements.append(condition)
                                     elif isinstance(query, (list, tuple)):
-                                        if not query_type in ('in', 'nin'):
+                                        if not query_type in ("in", "nin"):
                                             raise AttributeError(
                                                 "Lists/tuples must be used in conjunction "
                                                 "with $in/$nin when querying a ForeignKey "
@@ -1830,12 +1842,11 @@ class Backend(BaseBackend):
                                                 "in/nin query with empty list!"
                                             )
 
-                                        if query[0].__class__ is params['class']:
+                                        if query[0].__class__ is params["class"]:
                                             if any(
                                                 (
-                                                    element.__class__ is not params[
-                                                        'class'
-                                                    ]
+                                                    element.__class__
+                                                    is not params["class"]
                                                     for element in query
                                                 )
                                             ):
@@ -1845,12 +1856,12 @@ class Backend(BaseBackend):
 
                                             where_statements.append(
                                                 getattr(
-                                                    table.c[params['column']],
-                                                    query_type + '_',
+                                                    table.c[params["column"]],
+                                                    query_type + "_",
                                                 )(
                                                     [
                                                         expression.cast(
-                                                            doc.pk, params['type']
+                                                            doc.pk, params["type"]
                                                         )
                                                         for doc in query
                                                     ]
@@ -1859,12 +1870,12 @@ class Backend(BaseBackend):
                                         else:
                                             where_statements.append(
                                                 getattr(
-                                                    table.c[params['column']],
-                                                    query_type + '_',
+                                                    table.c[params["column"]],
+                                                    query_type + "_",
                                                 )(
                                                     [
                                                         expression.cast(
-                                                            element, params['type']
+                                                            element, params["type"]
                                                         )
                                                         for element in query
                                                     ]
@@ -1872,25 +1883,25 @@ class Backend(BaseBackend):
                                             )
                                     elif isinstance(query, Document):
                                         # we need an exact clas match here...
-                                        if query.__class__ is not params['class']:
+                                        if query.__class__ is not params["class"]:
                                             raise AttributeError(
                                                 "Invalid Document class!"
                                             )
 
                                         where_statements.append(
-                                            table.c[params['column']] == query.pk
+                                            table.c[params["column"]] == query.pk
                                         )
                                     else:
                                         where_statements.append(
-                                            table.c[params['column']] ==
-                                            expression.cast(
-                                                query, params['class'].Meta.PkType
+                                            table.c[params["column"]]
+                                            == expression.cast(
+                                                query, params["class"].Meta.PkType
                                             )
                                         )
                                 else:
                                     # we query a sub-field of the relation
                                     related_table = self._collection_tables[
-                                        params['collection']
+                                        params["collection"]
                                     ]
 
                                     if path_str in joins[related_table]:
@@ -1905,21 +1916,21 @@ class Backend(BaseBackend):
                                         joins_list.append(
                                             (
                                                 related_table_alias,
-                                                table.c[params['column']] ==
-                                                related_table_alias.c['pk'],
+                                                table.c[params["column"]]
+                                                == related_table_alias.c["pk"],
                                             )
                                         )
                                     where_statements.extend(
                                         compile_query(
-                                            params['collection'],
+                                            params["collection"],
                                             {tail: value},
                                             table=related_table_alias,
                                             path=new_path,
                                         )
                                     )
-                            elif isinstance(params['field'], OneToManyField):
+                            elif isinstance(params["field"], OneToManyField):
                                 related_table = self._collection_tables[
-                                    params['collection']
+                                    params["collection"]
                                 ]
 
                                 if path_str in joins[related_table]:
@@ -1931,9 +1942,9 @@ class Backend(BaseBackend):
                                         (
                                             related_table_alias,
                                             related_table_alias.c[
-                                                params['backref']['column']
-                                            ] ==
-                                            table.c['pk'],
+                                                params["backref"]["column"]
+                                            ]
+                                            == table.c["pk"],
                                         )
                                     )
 
@@ -1951,8 +1962,8 @@ class Backend(BaseBackend):
 
                     else:
                         raise AttributeError(
-                            "Query over non-indexed field %s in collection %s!" %
-                            (key, collection)
+                            "Query over non-indexed field %s in collection %s!"
+                            % (key, collection)
                         )
 
             return where_statements

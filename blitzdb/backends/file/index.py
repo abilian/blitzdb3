@@ -12,6 +12,7 @@ from .serializers import PickleSerializer as Serializer
 
 class NonUnique(BaseException):
     """Index uniqueness constraint violated"""
+
     pass
 
 
@@ -39,7 +40,7 @@ class Index(object):
         self._store = store
         self._serializer = serializer
         self._deserializer = deserializer
-        self._splitted_key = self.key.split('.')
+        self._splitted_key = self.key.split(".")
         self._unique = unique
 
         self._index = None
@@ -72,7 +73,7 @@ class Index(object):
         :rtype: str
 
         """
-        return self._params['key']
+        return self._params["key"]
 
     def get_value(self, attributes, key=None):
         """Get value to be indexed from document attributes.
@@ -107,11 +108,11 @@ class Index(object):
 
         """
         if not self._store:
-            raise AttributeError('No datastore defined!')
+            raise AttributeError("No datastore defined!")
 
         saved_data = self.save_to_data(in_place=True)
         data = Serializer.serialize(saved_data)
-        self._store.store_blob(data, 'all_keys_with_undefined')
+        self._store.store_blob(data, "all_keys_with_undefined")
 
     def get_all_keys(self):
         """Get all keys indexed.
@@ -143,15 +144,15 @@ class Index(object):
 
         """
         if not self._store:
-            raise AttributeError('No datastore defined!')
+            raise AttributeError("No datastore defined!")
 
-        if self._store.has_blob('all_keys'):
-            data = Serializer.deserialize(self._store.get_blob('all_keys'))
+        if self._store.has_blob("all_keys"):
+            data = Serializer.deserialize(self._store.get_blob("all_keys"))
             self.load_from_data(data)
             return True
 
-        elif self._store.has_blob('all_keys_with_undefined'):
-            blob = self._store.get_blob('all_keys_with_undefined')
+        elif self._store.has_blob("all_keys_with_undefined"):
+            blob = self._store.get_blob("all_keys_with_undefined")
             data = Serializer.deserialize(blob)
             self.load_from_data(data, with_undefined=True)
             return True
@@ -195,7 +196,7 @@ class Index(object):
             return sorted_keys + missing_keys
 
         else:
-            raise ValueError('Unexpected order value: {:d}'.format(order))
+            raise ValueError("Unexpected order value: {:d}".format(order))
 
     def save_to_data(self, in_place=False):
         """Save index to data structure.
@@ -245,8 +246,8 @@ class Index(object):
         :rtype: str
 
         """
-        if isinstance(value, dict) and '__ref__' in value:
-            return self.get_hash_for(value['__ref__'])
+        if isinstance(value, dict) and "__ref__" in value:
+            return self.get_hash_for(value["__ref__"])
 
         serialized_value = self._serializer(value)
         if isinstance(serialized_value, dict):
@@ -297,7 +298,7 @@ class Index(object):
 
         """
         if self._unique and hash_value in self._index:
-            raise NonUnique('Hash value {} already in index'.format(hash_value))
+            raise NonUnique("Hash value {} already in index".format(hash_value))
 
         if store_key not in self._index[hash_value]:
             self._index[hash_value].append(store_key)
@@ -392,9 +393,7 @@ class TransactionalIndex(Index):
 
     def commit(self):
         """Commit current transaction."""
-        if (
-            not self._add_cache and not self._remove_cache and not self._undefined_cache
-        ):
+        if not self._add_cache and not self._remove_cache and not self._undefined_cache:
             return
 
         for store_key, hash_values in self._add_cache.items():

@@ -18,14 +18,14 @@ class Store(object):
     def __init__(self, properties):
         self._properties = properties
 
-        if 'path' not in properties:
+        if "path" not in properties:
             raise AttributeError("You must specify a path when creating a Store!")
 
-        if not os.path.exists(properties['path']):
-            os.makedirs(properties['path'])
+        if not os.path.exists(properties["path"]):
+            os.makedirs(properties["path"])
 
     def _get_path_for_key(self, key):
-        return os.path.join(self._properties['path'], key)
+        return os.path.join(self._properties["path"], key)
 
     def store_blob(self, blob, key):
         with open(self._get_path_for_key(key), "wb") as output_file:

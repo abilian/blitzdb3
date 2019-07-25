@@ -23,14 +23,14 @@ def test_basic_storage(backend, small_test_data):
 
 def test_delete(backend):
 
-    actor = Actor({'foo': 'bar'})
+    actor = Actor({"foo": "bar"})
 
     backend.save(actor)
     backend.commit()
 
-    assert actor.foo == 'bar'
+    assert actor.foo == "bar"
 
-    assert backend.get(Actor, {'pk': actor.pk}).foo == 'bar'
+    assert backend.get(Actor, {"pk": actor.pk}).foo == "bar"
 
     del actor.foo
 
@@ -38,10 +38,10 @@ def test_delete(backend):
         actor.foo
 
     with pytest.raises(KeyError):
-        actor['foo']
+        actor["foo"]
 
     backend.save(actor)
     backend.commit()
 
     with pytest.raises(AttributeError):
-        backend.get(Actor, {'pk': actor.pk}).foo
+        backend.get(Actor, {"pk": actor.pk}).foo

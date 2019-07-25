@@ -17,17 +17,15 @@ if six.PY3:
 
 
 class DoesNotExist(BaseException):
-
     def __str__(self):
         message = BaseException.__str__(self)
-        return u"DoesNotExist({}): {}".format(self.__class__.__name__, message)
+        return "DoesNotExist({}): {}".format(self.__class__.__name__, message)
 
 
 class MultipleDocumentsReturned(BaseException):
-
     def __str__(self):
         message = BaseException.__str__(self)
-        return u"MultipleDocumentsReturned({}): {}".format(
+        return "MultipleDocumentsReturned({}): {}".format(
             self.__class__.__name__, message
         )
 
@@ -40,14 +38,14 @@ class MetaDocument(type):
 
     def __new__(meta, name, bases, dct):
         sanitized_dct = {}
-        sanitized_dct['fields'] = {}
+        sanitized_dct["fields"] = {}
 
         class_type = type.__new__(meta, name, bases, dct)
 
         fields = {}
 
         # we inherit the fields from the base type(s)
-        if hasattr(class_type, 'fields'):
+        if hasattr(class_type, "fields"):
             fields.update(class_type.fields)
 
         for key, value in dct.items():
@@ -74,10 +72,10 @@ class MetaDocument(type):
 
         if class_type in document_classes:
             document_classes.remove(class_type)
-        if name == 'Document' and bases == (object,):
+        if name == "Document" and bases == (object,):
             pass
         elif not (
-            hasattr(class_type.Meta, 'autoregister')
+            hasattr(class_type.Meta, "autoregister")
             and class_type.Meta.autoregister == False
         ):
             document_classes.append(class_type)
@@ -190,7 +188,7 @@ class Document(object):
 
     def __getitem__(self, key):
         try:
-            lazy = super(Document, self).__getattribute__('_lazy')
+            lazy = super(Document, self).__getattribute__("_lazy")
         except AttributeError:
             lazy = False
         if lazy:
@@ -249,9 +247,9 @@ class Document(object):
         self._properties = value
 
     def __contains__(self, key):
-        return True if (
-            key in self.lazy_attributes or key in self.attributes
-        ) else False
+        return (
+            True if (key in self.lazy_attributes or key in self.attributes) else False
+        )
 
     def __iter__(self):
         for key in self.keys():
@@ -282,14 +280,14 @@ class Document(object):
             raise AttributeError(key)
 
     def __setattr__(self, key, value):
-        if key.startswith('_') or key in ('attributes', 'pk', 'lazy', 'backend'):
+        if key.startswith("_") or key in ("attributes", "pk", "lazy", "backend"):
             return super(Document, self).__setattr__(key, value)
 
         else:
             self.attributes[key] = value
 
     def __delattr__(self, key):
-        if key.startswith('_'):
+        if key.startswith("_"):
             return super(Document, self).__delattr__(key)
 
         try:
@@ -387,9 +385,9 @@ class Document(object):
             else:
                 return d
 
-        return self.__class__.__name__ + "(" + str(
-            truncate_dict(self._attributes)
-        ) + ")"
+        return (
+            self.__class__.__name__ + "(" + str(truncate_dict(self._attributes)) + ")"
+        )
 
     __repr__ = _represent
 
@@ -423,9 +421,11 @@ class Document(object):
 
     @classmethod
     def get_pk_name(cls):
-        return cls.Meta.primary_key if hasattr(
-            cls.Meta, 'primary_key'
-        ) else Document.Meta.primary_key
+        return (
+            cls.Meta.primary_key
+            if hasattr(cls.Meta, "primary_key")
+            else Document.Meta.primary_key
+        )
 
     @property
     def pk(self):
@@ -536,8 +536,8 @@ class Document(object):
 
         self._lazy = False
         logger.debug(
-            "Reverting to database state (%s, %s)" %
-            (self.__class__.__name__, str(self.pk))
+            "Reverting to database state (%s, %s)"
+            % (self.__class__.__name__, str(self.pk))
         )
         if self._db_loader:
             obj = self._db_loader()

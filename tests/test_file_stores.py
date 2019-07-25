@@ -12,7 +12,7 @@ from blitzdb.backends.file import TransactionalStore
 def transactional_store():
     tmpdir = tempfile.mkdtemp()
 
-    yield TransactionalStore({'path': tmpdir})
+    yield TransactionalStore({"path": tmpdir})
 
     subprocess.call(["rm", "-rf", tmpdir])
 

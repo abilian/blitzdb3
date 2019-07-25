@@ -10,17 +10,15 @@ from ..conftest import _sql_backend, get_sql_engine
 
 
 class DirectorAward(Document):
-
     class Meta(Document.Meta):
         autoregister = False
 
     name = CharField(indexed=True)
 
-    director = ForeignKeyField('Director', backref='awards')
+    director = ForeignKeyField("Director", backref="awards")
 
 
 class Actor(Document):
-
     class Meta(Document.Meta):
         autoregister = False
 
@@ -28,17 +26,15 @@ class Actor(Document):
 
 
 class Movie(Document):
-
     class Meta(Document.Meta):
         autoregister = False
 
-    director = ForeignKeyField('Director', backref='movies')
-    actors = ManyToManyField('Actor', backref='movies')
+    director = ForeignKeyField("Director", backref="movies")
+    actors = ManyToManyField("Actor", backref="movies")
     name = CharField(indexed=True)
 
 
 class Director(Document):
-
     class Meta(Document.Meta):
         autoregister = False
 
@@ -53,12 +49,12 @@ def _init_backend(backend):
     backend.init_schema()
     backend.create_schema()
 
-    ted_kotcheff = Director({'name': 'Ted Kotcheff'})
-    silvester_stallone = Actor({'name': 'Silvester Stallone'})
+    ted_kotcheff = Director({"name": "Ted Kotcheff"})
+    silvester_stallone = Actor({"name": "Silvester Stallone"})
     rambo = Movie(
-        {'name': 'Rambo I', 'actors': [silvester_stallone], 'director': ted_kotcheff}
+        {"name": "Rambo I", "actors": [silvester_stallone], "director": ted_kotcheff}
     )
-    oscar = DirectorAward({'name': 'Oscar', 'director': ted_kotcheff})
+    oscar = DirectorAward({"name": "Oscar", "director": ted_kotcheff})
 
     with backend.transaction():
         backend.save(rambo)
@@ -69,7 +65,7 @@ def _init_backend(backend):
 def cascade_backend(request):
     engine = get_sql_engine()
     backend = _sql_backend(
-        request, engine, autodiscover_classes=False, ondelete='CASCADE'
+        request, engine, autodiscover_classes=False, ondelete="CASCADE"
     )
     _init_backend(backend)
     return backend

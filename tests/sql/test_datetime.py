@@ -11,7 +11,6 @@ from blitzdb.fields import DateTimeField
 
 
 class Actor(Document):
-
     class Meta(Document.Meta):
         autoregister = False
 
@@ -20,7 +19,7 @@ class Actor(Document):
 
 @pytest.fixture
 def backend():
-    engine = create_engine('sqlite:///:memory:', echo=True)
+    engine = create_engine("sqlite:///:memory:", echo=True)
     backend = Backend(engine=engine, autodiscover_classes=False)
     backend.register(Actor)
     backend.init_schema()
@@ -29,7 +28,7 @@ def backend():
 
 
 def test_basics(backend):
-    actor = Actor({'created_at': datetime.datetime.now()})
+    actor = Actor({"created_at": datetime.datetime.now()})
 
     backend.save(actor)
     backend.commit()

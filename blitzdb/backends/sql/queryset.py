@@ -17,7 +17,6 @@ from blitzdb.queryset import QuerySet as BaseQuerySet
 
 
 class QuerySet(BaseQuerySet):
-
     def __init__(
         self,
         backend,
@@ -153,11 +152,11 @@ class QuerySet(BaseQuerySet):
         def join_table(collection, table, key, params, key_path=None):
             if key_path is None:
                 key_path = []
-            if isinstance(params['relation']['field'], ManyToManyField):
+            if isinstance(params["relation"]["field"], ManyToManyField):
                 join_many_to_many(collection, table, key, params, key_path)
-            elif isinstance(params['relation']['field'], ForeignKeyField):
+            elif isinstance(params["relation"]["field"], ForeignKeyField):
                 join_foreign_key(collection, table, key, params, key_path)
-            elif isinstance(params['relation']['field'], OneToManyField):
+            elif isinstance(params["relation"]["field"], OneToManyField):
                 join_one_to_many(collection, table, key, params, key_path)
             else:
                 raise AttributeError
@@ -166,24 +165,24 @@ class QuerySet(BaseQuerySet):
             related_collection, related_table, params, key_path
         ):
 
-            params['table_fields'] = {}
-            for field, column_name in params['fields'].items():
-                column_label = '_'.join(key_path + [column_name])
-                params['table_fields'][field] = column_label
+            params["table_fields"] = {}
+            for field, column_name in params["fields"].items():
+                column_label = "_".join(key_path + [column_name])
+                params["table_fields"][field] = column_label
                 try:
                     column = related_table.c[column_name].label(column_label)
                 except KeyError:
                     continue
 
                 all_columns.append(column)
-                if field != '__data__':
+                if field != "__data__":
                     column_map[".".join(key_path + [field])] = column
 
             for subkey, subparams in sorted(
-                params['joins'].items(), key=lambda i: i[0]
+                params["joins"].items(), key=lambda i: i[0]
             ):
                 join_table(
-                    params['collection'],
+                    params["collection"],
                     related_table,
                     subkey,
                     subparams,
@@ -191,37 +190,39 @@ class QuerySet(BaseQuerySet):
                 )
 
         def join_one_to_many(collection, table, key, params, key_path):
-            related_table = params['table'].alias()
-            related_collection = params['relation']['collection']
-            condition = table.c['pk'] == related_table.c[
-                params['relation']['backref']['column']
-            ]
+            related_table = params["table"].alias()
+            related_collection = params["relation"]["collection"]
+            condition = (
+                table.c["pk"]
+                == related_table.c[params["relation"]["backref"]["column"]]
+            )
             joins.append((related_table, condition))
             process_fields_and_subkeys(
                 related_collection, related_table, params, key_path
             )
 
         def join_foreign_key(collection, table, key, params, key_path):
-            related_table = params['table'].alias()
-            related_collection = params['relation']['collection']
-            condition = table.c[params['relation']['column']] == related_table.c.pk
+            related_table = params["table"].alias()
+            related_collection = params["relation"]["collection"]
+            condition = table.c[params["relation"]["column"]] == related_table.c.pk
             joins.append((related_table, condition))
             process_fields_and_subkeys(
                 related_collection, related_table, params, key_path
             )
 
         def join_many_to_many(collection, table, key, params, key_path):
-            relationship_table = params['relation']['relationship_table'].alias()
-            related_collection = params['relation']['collection']
+            relationship_table = params["relation"]["relationship_table"].alias()
+            related_collection = params["relation"]["collection"]
             related_table = self.backend.get_collection_table(
                 related_collection
             ).alias()
-            left_condition = relationship_table.c[
-                params['relation']['pk_field_name']
-            ] == table.c.pk
-            right_condition = relationship_table.c[
-                params['relation']['related_pk_field_name']
-            ] == related_table.c.pk
+            left_condition = (
+                relationship_table.c[params["relation"]["pk_field_name"]] == table.c.pk
+            )
+            right_condition = (
+                relationship_table.c[params["relation"]["related_pk_field_name"]]
+                == related_table.c.pk
+            )
             joins.append((relationship_table, left_condition))
             joins.append((related_table, right_condition))
             process_fields_and_subkeys(
@@ -264,14 +265,14 @@ class QuerySet(BaseQuerySet):
         )
 
         # we only select the columns that we actually need
-        my_columns = list(self.include_joins['fields'].values()) + [
-            params['relation']['column']
-            for params in self.include_joins['joins'].values()
-            if isinstance(params['relation']['field'], ForeignKeyField)
+        my_columns = list(self.include_joins["fields"].values()) + [
+            params["relation"]["column"]
+            for params in self.include_joins["joins"].values()
+            if isinstance(params["relation"]["field"], ForeignKeyField)
         ]
 
         process_fields_and_subkeys(
-            self.include_joins['collection'], self.table, self.include_joins, []
+            self.include_joins["collection"], self.table, self.include_joins, []
         )
 
         select_table = self.table
@@ -282,12 +283,14 @@ class QuerySet(BaseQuerySet):
 
         bare_select = self.get_bare_select(columns=[self.table.c.pk])
 
-        s = select(
-            [column_map[key] for key in columns] if columns is not None else all_columns
-        ).select_from(
-            select_table
-        ).where(
-            column_map['pk'].in_(bare_select)
+        s = (
+            select(
+                [column_map[key] for key in columns]
+                if columns is not None
+                else all_columns
+            )
+            .select_from(select_table)
+            .where(column_map["pk"].in_(bare_select))
         )
 
         # we order again, this time including the joined columns
@@ -299,11 +302,8 @@ class QuerySet(BaseQuerySet):
         return s
 
     def get_objects(self):
-
         def build_field_map(params, path=None, current_map=None):
-
             def m2m_o2m_getter(join_params, name, pk_key):
-
                 def f(d, obj):
                     pk_value = obj[pk_key]
                     try:
@@ -315,18 +315,17 @@ class QuerySet(BaseQuerySet):
 
                     if pk_value not in v:
                         v[pk_value] = {}
-                    if '__lazy__' not in v[pk_value]:
-                        v[pk_value]['__lazy__'] = join_params['lazy']
-                    if '__collection__' not in v[pk_value]:
-                        v[pk_value]['__collection__'] = join_params['collection']
+                    if "__lazy__" not in v[pk_value]:
+                        v[pk_value]["__lazy__"] = join_params["lazy"]
+                    if "__collection__" not in v[pk_value]:
+                        v[pk_value]["__collection__"] = join_params["collection"]
                     return v[pk_value]
 
                 return f
 
             def fk_getter(join_params, key):
-
                 def f(d, obj):
-                    pk_value = obj[join_params['table_fields']['pk']]
+                    pk_value = obj[join_params["table_fields"]["pk"]]
                     if pk_value is None:
                         # we set the key value to "None", to indicate that the FK is None
                         d[key] = None
@@ -335,10 +334,10 @@ class QuerySet(BaseQuerySet):
                     if not key in d:
                         d[key] = {}
                     v = d[key]
-                    if '__lazy__' not in v:
-                        v['__lazy__'] = join_params['lazy']
-                    if '__collection__' not in v:
-                        v['__collection__'] = join_params['collection']
+                    if "__lazy__" not in v:
+                        v["__lazy__"] = join_params["lazy"]
+                    if "__collection__" not in v:
+                        v["__collection__"] = join_params["collection"]
                     return v
 
                 return f
@@ -347,23 +346,23 @@ class QuerySet(BaseQuerySet):
                 current_map = {}
             if path is None:
                 path = []
-            for key, field in params['table_fields'].items():
-                if key in params['joins']:
+            for key, field in params["table_fields"].items():
+                if key in params["joins"]:
                     continue
 
                 current_map[field] = path + [key]
-            for name, join_params in params['joins'].items():
+            for name, join_params in params["joins"].items():
                 if name in current_map:
                     del current_map[name]
                 if isinstance(
-                    join_params['relation']['field'], (ManyToManyField, OneToManyField)
+                    join_params["relation"]["field"], (ManyToManyField, OneToManyField)
                 ):
                     build_field_map(
                         join_params,
-                        path +
-                        [
+                        path
+                        + [
                             m2m_o2m_getter(
-                                join_params, name, join_params['table_fields']['pk']
+                                join_params, name, join_params["table_fields"]["pk"]
                             )
                         ],
                         current_map,
@@ -403,12 +402,12 @@ class QuerySet(BaseQuerySet):
 
         unpacked_objects = OrderedDict()
         for obj in objects:
-            if not obj['pk'] in unpacked_objects:
-                unpacked_objects[obj['pk']] = {
-                    '__lazy__': self.include_joins['lazy'],
-                    '__collection__': self.include_joins['collection'],
+            if not obj["pk"] in unpacked_objects:
+                unpacked_objects[obj["pk"]] = {
+                    "__lazy__": self.include_joins["lazy"],
+                    "__collection__": self.include_joins["collection"],
                 }
-            unpacked_obj = unpacked_objects[obj['pk']]
+            unpacked_obj = unpacked_objects[obj["pk"]]
             for key, path in field_map.items():
                 d = unpacked_obj
                 for element in path[:-1]:
@@ -480,10 +479,10 @@ class QuerySet(BaseQuerySet):
 
     def intersect(self, qs):
         # here the .self_group() is necessary to ensure the correct grouping within the INTERSECT...
-        my_s = self.get_bare_select(columns=[self.table.c.pk.label('pk')]).alias()
-        qs_s = qs.get_bare_select(columns=[qs.table.c.pk.label('pk')]).alias()
-        my_pk_s = select(['pk']).select_from(my_s)
-        qs_pk_s = select(['pk']).select_from(qs_s)
+        my_s = self.get_bare_select(columns=[self.table.c.pk.label("pk")]).alias()
+        qs_s = qs.get_bare_select(columns=[qs.table.c.pk.label("pk")]).alias()
+        my_pk_s = select(["pk"]).select_from(my_s)
+        qs_pk_s = select(["pk"]).select_from(qs_s)
         condition = self.table.c.pk.in_(expression.intersect(my_pk_s, qs_pk_s))
         new_qs = QuerySet(
             self.backend,

@@ -10,12 +10,12 @@ class User(Document):
 
 class Subscription(Document):
 
-    user = ForeignKeyField(User, unique=True, backref='subscription')
+    user = ForeignKeyField(User, unique=True, backref="subscription")
 
 
 class Stripe(Document):
 
-    user = ForeignKeyField(User, unique=True, backref='stripe')
+    user = ForeignKeyField(User, unique=True, backref="stripe")
 
 
 def test_unique_backrefs(empty_backend):
@@ -26,15 +26,15 @@ def test_unique_backrefs(empty_backend):
 
     empty_backend.create_schema()
 
-    user = User({'name': 'test'})
-    subscription = Subscription({'user': user})
-    stripe = Stripe({'user': user})
+    user = User({"name": "test"})
+    subscription = Subscription({"user": user})
+    stripe = Stripe({"user": user})
 
     empty_backend.save(stripe)
     empty_backend.save(subscription)
     empty_backend.commit()
 
-    recovered_user = empty_backend.get(User, {}, include=('subscription', 'stripe'))
+    recovered_user = empty_backend.get(User, {}, include=("subscription", "stripe"))
 
     assert recovered_user == user
     assert not recovered_user.stripe.lazy
@@ -56,12 +56,12 @@ def test_non_existing_unique_backrefs(empty_backend):
 
     empty_backend.create_schema()
 
-    user = User({'name': 'test'})
+    user = User({"name": "test"})
 
     empty_backend.save(user)
     empty_backend.commit()
 
-    recovered_user = empty_backend.get(User, {}, include=('subscription', 'stripe'))
+    recovered_user = empty_backend.get(User, {}, include=("subscription", "stripe"))
 
     assert recovered_user == user
     assert recovered_user.stripe is None
