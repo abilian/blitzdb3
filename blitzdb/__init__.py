@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 from .backends.file import Backend as FileBackend
 from .document import Document
 
