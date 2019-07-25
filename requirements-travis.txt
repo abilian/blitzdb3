@@ -1,6 +1,6 @@
 Faker==0.7.7
 pytest>=2.5.0
 sqlalchemy
-psycopg2
+psycopg2-binary
 alembic
 pymongo>=3.0.1
