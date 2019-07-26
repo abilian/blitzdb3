@@ -13,7 +13,6 @@ from blitzdb.fields import BooleanField, CharField, FloatField, \
 
 
 class Movie(Document):
-
     title = CharField(nullable=True, indexed=True)
     director = ForeignKeyField(related="Director", nullable=True, backref="movies")
     cast = ManyToManyField(related="Actor")
@@ -26,7 +25,6 @@ class Movie(Document):
 
 
 class Actor(Document):
-
     name = CharField(indexed=True)
     gross_income_m = FloatField(indexed=True)
     salary_amount = FloatField(indexed=True, key="salary.amount")
@@ -39,12 +37,10 @@ class Actor(Document):
 
 
 class Food(Document):
-
     name = CharField(indexed=True)
 
 
 class Director(Document):
-
     """
     Warning: There is a circular foreign key relationship between
     Director and Movie, hence trying to save a pair of those objects
@@ -58,14 +54,12 @@ class Director(Document):
 
 
 class Role(Document):
-
     role = CharField(indexed=True)
     actor = ForeignKeyField("Actor", nullable=False)
     movie = ForeignKeyField("Movie", nullable=False)
 
 
 def generate_test_data(request, backend, n):
-
     fake = Factory.create()
 
     actors = []
