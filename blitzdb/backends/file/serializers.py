@@ -1,3 +1,8 @@
+"""
+Serializers take a Python object and return a string representation of it.
+BlitzDB currently supports several differen JSON serializers,
+as well as a cPickle serializer.
+"""
 from __future__ import absolute_import, print_function, unicode_literals
 
 import json
@@ -10,12 +15,6 @@ if six.PY3:
     import pickle as cPickle
 else:
     import cPickle
-
-"""
-Serializers take a Python object and return a string representation of it.
-BlitzDB currently supports several differen JSON serializers,
-as well as a cPickle serializer.
-"""
 
 
 class JsonSerializer(object):

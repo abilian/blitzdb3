@@ -67,7 +67,6 @@ class QuerySet(BaseQuerySet):
         return self
 
     def deserialize(self, data):
-
         if isinstance(data, Document):
             return data
 
@@ -77,7 +76,6 @@ class QuerySet(BaseQuerySet):
             return d
 
         obj = self.backend.create_instance(self.cls, d, lazy=lazy)
-
         return obj
 
     def sort(self, keys, direction=None, explicit_nullsfirst=False):
@@ -118,7 +116,7 @@ class QuerySet(BaseQuerySet):
             self.get_deserialized_objects()
         for obj in self.deserialized_objects:
             yield obj
-        raise StopIteration
+        # raise StopIteration
 
     def __contains__(self, obj):
         # todo: optimize this so we don't go to the database

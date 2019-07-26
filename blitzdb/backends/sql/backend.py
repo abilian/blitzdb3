@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import re
+import sys
 import uuid
 from collections import defaultdict
 from types import LambdaType
@@ -1723,8 +1724,12 @@ class Backend(BaseBackend):
             for key, value in query.items():
                 for field_name, params in self._index_fields[collection].items():
                     if key == field_name:
-                        if isinstance(value, re._pattern_type):
+                        if sys.version_info[0:2] >= (3, 7):
+                            if isinstance(value, re.Pattern):
+                                value = {"$regex": value.pattern}
+                        elif isinstance(value, re._pattern_type):
                             value = {"$regex": value.pattern}
+
                         if isinstance(value, dict):
                             # this is a special query
                             where_statements.extend(

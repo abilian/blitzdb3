@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 sudo: false
 addons:
@@ -16,20 +17,15 @@ env:
 
 python:
   - "2.7"
-  - "3.4"
-  - "3.5"
   - "3.6"
-  # does not have headers provided, please ask https://launchpad.net/~pypy/+archive/ppa
-  # maintainers to fix their pypy-dev package.
-  # pypy tests are disabled until I can figure out a way to install the correct packages for this...
-  #- "pypy"
- 
+  - "3.7"
+
 # command to install dependencies
 install:
   - pip install .
-  - pip install -r requirements.txt
   - pip install -r requirements-travis.txt
   - echo $BLITZDB_SQLALCHEMY_URL
-  
+
 # command to run tests
-script: pytest
+script:
+  - pytest

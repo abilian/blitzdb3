@@ -5,12 +5,7 @@ import os
 import os.path
 
 
-"""
-"""
-
-
 class Store(object):
-
     """This class stores binary data in files."""
 
     def __init__(self, properties):

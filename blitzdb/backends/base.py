@@ -582,7 +582,7 @@ class Backend(object):
 
     @abc.abstractmethod
     def delete(self, obj):
-        """Deletes an object from the database.
+        """Delete an object from the database.
 
         :param obj: The object to be deleted.
         """

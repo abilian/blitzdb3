@@ -7,7 +7,6 @@ from .queryset import QuerySet
 
 
 class ManyToManyProxy(object):
-
     """The ManyToManyProxy transparently handles n:m relationships among
     different object types. It automatically retrieves related documents from
     the database and initializes them.

@@ -1,13 +1,11 @@
-# Blitz-DB
+# Blitz-DB3
 
-[![Build Status](https://travis-ci.org/adewes/blitzdb.svg?branch=master)](https://travis-ci.org/adewes/blitzdb)
-[![PyPI](https://img.shields.io/pypi/v/blitzdb.svg?maxAge=1000)](https://pypi.python.org/pypi/blitzdb)
-[![Code Issues](http://www.quantifiedcode.com/api/v1/project/gh:adewes:blitzdb/badge.svg)](http://www.quantifiedcode.com/app/project/gh:adewes:blitzdb)
-[![Python 3](http://img.shields.io/badge/Python%203%20-compatible-brightgreen.svg)](https://www.python.org/download/releases/3.0/)
+[![Build Status](https://travis-ci.org/abilian/blitzdb3.svg?branch=master)](https://travis-ci.org/abilian/blitzdb3)
+[![PyPI](https://img.shields.io/pypi/v/blitzdb3.svg?maxAge=1000)](https://pypi.python.org/pypi/blitzdb3)
+
+**BlitzDB3** is a port of BlitzDB to Python 3. We're using BlitzDB on some internal projects at [Abilian](https://www.abilian.com/) and needed these changes to migrate these projects to Python 3.
 
 **BlitzDB**, or just **Blitz** is a document-based, object-oriented, transactional database written purely in Python. Among other things, it provides a **powerful querying language**, **deep indexing of documents**, **compressed data storage** and **automatic referencing of embedded documents**. It is reasonably fast, can be easily embedded in any Python application and does not have any external dependencies (except when using a third-party backend). In addition, you can use it as a **frontend** to other database engines such as MongoDB in case you should need more power.
-
-## [Go To Main Documentation](http://blitzdb.readthedocs.org)
 
 ## Key Features
 
@@ -36,7 +34,16 @@ For more detailed installation instructions, have a look at the [documentation](
 
 The detailed documentation for this project is hosted on [ReadTheDocs](http://blitzdb.readthedocs.org), feel free to take a look!
 
+## Roadmap
+
+* 0.2 (unreleased): keep fixing and upgrading.
+* 1.0 (unreleased): drop support for Python 2.
+
 ## Changelog
+
+* 0.1.0: Port to Python 3 using six. Cleanup and format code. 
+
+## Old Changelog (original Blitzdb by Andreas Dewes / andreas@7scientists.com)
 
 * 0.4.4: SQL backend: Do not coerce server_default values via a CAST, as this can cause incompatibilities.
 * 0.4.3: Many small improvements to the SQL backend.
@@ -65,6 +72,15 @@ The detailed documentation for this project is hosted on [ReadTheDocs](http://bl
 
 ## Contributors (in alphabetical order)
 
+### Original author (BlitzDB)
+
+* Andreas Dewes - @adewes
+
+### Current maintainer (BlitzDB3)
+
+* Stefane Fermigier - @sfermigier
+
+### 
 *  @bwiessneth
 *  Florian Lehmann - @cashaddy
 *  Karskrin - @cBrauge
@@ -105,10 +121,10 @@ class Movie(Document):
 class Actor(Document):
     pass
 
-the_godfather = Movie({'name': 'The Godfather','year':1972,'pk':1L})
+the_godfather = Movie({'name': 'The Godfather','year':1972,'pk': 1})
 
-marlon_brando = Actor({'name':'Marlon Brando','pk':1L})
-al_pacino = Actor({'name' : 'Al Pacino','pk':1L})
+marlon_brando = Actor({'name':'Marlon Brando','pk': 1})
+al_pacino = Actor({'name' : 'Al Pacino','pk': 1})
 ```
 
 ### Storing objects in the database:
@@ -126,15 +142,15 @@ al_pacino.save(backend)
 ### Retrieving objects from the database:
 
 ```python
-the_godfather = backend.get(Movie,{'pk':1L})
+the_godfather = backend.get(Movie, {'pk': 1})
 #or...
-the_godfather = backend.get(Movie,{'name' : 'The Godfather'})
+the_godfather = backend.get(Movie, {'name' : 'The Godfather'})
 ```
 
 ### Filtering objects
 
 ```python
-movies_from_1972 = backend.filter(Movie,{'year' : 1972})
+movies_from_1972 = backend.filter(Movie, {'year' : 1972})
 ```
 
 ### Working with transactions
