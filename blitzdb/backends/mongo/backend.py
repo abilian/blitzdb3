@@ -47,10 +47,10 @@ class DotEncoder(object):
 
 
 class Backend(BaseBackend):
-
     """A MongoDB backend.
 
-    :param db: An instance of a `pymongo.database.Database <http://api.mongodb.org/python/current/api/pymongo/database.html>`_ class
+    :param db: An instance of a `pymongo.database.Database
+     <http://api.mongodb.org/python/current/api/pymongo/database.html>`_ class
 
     Example usage:
 
@@ -151,7 +151,6 @@ class Backend(BaseBackend):
             self._delete_cache[collection].update({pk: True for pk in pks})
 
     def delete(self, obj):
-
         self.call_hook("before_delete", obj)
 
         collection = self.get_collection_for_cls(obj.__class__)

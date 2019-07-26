@@ -4,9 +4,6 @@ from blitzdb.queryset import QuerySet as BaseQuerySet
 
 
 class QuerySet(BaseQuerySet):
-
-    """"""
-
     def __init__(self, backend, cls, cursor, raw=False, only=None):
         super(QuerySet, self).__init__(backend, cls)
         self._cursor = cursor
@@ -93,9 +90,6 @@ class QuerySet(BaseQuerySet):
 
     def filter(self, *args, **kwargs):
         return self.backend.filter(self.cls, *args, initial_keys=self.keys, **kwargs)
-
-    def __len__(self):
-        return self._cursor.count()
 
     def __ne__(self, other):
         return not self.__eq__(other)

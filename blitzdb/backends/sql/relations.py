@@ -12,7 +12,7 @@ class ManyToManyProxy(object):
     the database and initializes them.
 
     From the outside, the behavior corresponds to that of a normal Python list to which we
-    can append
+    can append.
 
     Open questions:
 

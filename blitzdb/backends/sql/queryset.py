@@ -87,13 +87,19 @@ class QuerySet(BaseQuerySet):
             if direction > 0:
                 # when sorting in ascending direction, NULL values should come first
                 if explicit_nullsfirst:
-                    direction = lambda *args, **kwargs: nullsfirst(asc(*args, **kwargs))
+
+                    def direction(*args, **kwargs):
+                        return nullsfirst(asc(*args, **kwargs))
+
                 else:
                     direction = asc
             else:
                 # when sorting in descending direction, NULL values should come last
                 if explicit_nullsfirst:
-                    direction = lambda *args, **kwargs: nullslast(desc(*args, **kwargs))
+
+                    def direction(*args, **kwargs):
+                        return nullslast(desc(*args, **kwargs))
+
                 else:
                     direction = desc
             order_bys.append((key, direction))

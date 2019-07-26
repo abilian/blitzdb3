@@ -228,7 +228,11 @@ class Backend(BaseBackend):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related one-to-many field %s of class %s already defined in collection %s by class %s (this might be a problem with a backreference)"
+                    (
+                        "Related one-to-many field %s of class %s "
+                        + "already defined in collection %s by class %s "
+                        + "(this might be a problem with a backreference)"
+                    )
                     % (
                         key,
                         cls.__name__,
@@ -274,7 +278,10 @@ class Backend(BaseBackend):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related foreign key field %s already defined in collection %s (this might be a problem with a backreference)"
+                    (
+                        "Related foreign key field %s already defined "
+                        + "in collection %s (this might be a problem with a backreference)"
+                    )
                     % (key, collection)
                 )
 
@@ -342,7 +349,10 @@ class Backend(BaseBackend):
 
             if key in self._related_fields[collection]:
                 raise AttributeError(
-                    "Related many-to-many field %s already defined in collection %s (this might be a problem with a backreference)"
+                    (
+                        "Related many-to-many field %s already defined "
+                        + "in collection %s (this might be a problem with a backreference)"
+                    )
                     % (key, collection)
                 )
 

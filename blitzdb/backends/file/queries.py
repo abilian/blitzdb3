@@ -7,9 +7,6 @@ import re
 import six
 from six.moves import reduce
 
-if six.PY3:
-    from functools import reduce
-
 
 def boolean_operator_query(boolean_operator):
     """Generate boolean operator checking function."""

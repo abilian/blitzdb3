@@ -185,6 +185,7 @@ class Backend(object):
                 boring = dir(type(b"dummy", (object,), {}))
             else:
                 boring = dir(type("dummy", (object,), {}))
+
             return dict(
                 [item for item in inspect.getmembers(cls) if item[0] not in boring]
             )
@@ -220,11 +221,16 @@ class Backend(object):
         `Document` instances by database references to them.
 
         :param obj: The object to serialize.
-        :param convert_keys_to_str: If `True`, converts all dictionary keys to string (this is e.g. required for the MongoDB backend)
-        :param embed_level: If `embed_level > 0`, instances of `Document` classes will be embedded instead of referenced.
-                            The value of the parameter will get decremented by 1 when calling `serialize` on child objects.
-        :param autosave: Whether to automatically save embedded objects without a primary key to the database.
-        :param for_query: If true, only the `pk` and `__collection__` attributes will be included in document references.
+        :param convert_keys_to_str: If `True`, converts all dictionary keys to string
+            (this is e.g. required for the MongoDB backend)
+        :param embed_level: If `embed_level > 0`, instances of `Document` classes will
+            be embedded instead of referenced.
+            The value of the parameter will get decremented by 1 when calling
+            `serialize` on child objects.
+        :param autosave: Whether to automatically save embedded objects without
+            a primary key to the database.
+        :param for_query: If true, only the `pk` and `__collection__` attributes
+            will be included in document references.
 
         :returns: The serialized object.
         """
@@ -239,15 +245,16 @@ class Backend(object):
                 current_dict = current_dict[key_fragment]
             return current_dict
 
-        serialize_with_opts = lambda value, *args, **kwargs: self.serialize(
-            value,
-            *args,
-            encoders=encoders,
-            convert_keys_to_str=convert_keys_to_str,
-            autosave=autosave,
-            for_query=for_query,
-            **kwargs
-        )
+        def serialize_with_opts(value, *args, **kwargs):
+            return self.serialize(
+                value,
+                *args,
+                encoders=encoders,
+                convert_keys_to_str=convert_keys_to_str,
+                autosave=autosave,
+                for_query=for_query,
+                **kwargs
+            )
 
         if encoders is None:
             encoders = []
@@ -281,8 +288,10 @@ class Backend(object):
                     )
                 except DoNotSerialize:
                     pass
+
         elif isinstance(obj, six.string_types):
             output_obj = encode_as_str(obj)
+
         elif isinstance(obj, (list, tuple)):
             try:
                 output_obj = [
@@ -291,6 +300,7 @@ class Backend(object):
                 ]
             except DoNotSerialize:
                 pass
+
         elif isinstance(obj, Document):
             collection = self.get_collection_for_obj(obj)
             if embed_level > 0:
@@ -305,11 +315,12 @@ class Backend(object):
             elif obj.embed:
                 output_obj = self.serialize(obj)
             else:
-                if obj.pk == None and autosave:
+                if obj.pk is None and autosave:
                     obj.save(self)
 
                 if obj._lazy:
-                    # We make sure that all attributes that are already present get included in the reference
+                    # We make sure that all attributes that are already present
+                    # get included in the reference
                     output_obj = {}
                     if obj.get_pk_name() in output_obj:
                         del output_obj[obj.get_pk_name()]
@@ -355,10 +366,11 @@ class Backend(object):
 
         else:
             output_obj = obj
+
         return output_obj
 
     def deserialize(self, obj, encoders=None, embedded=False, create_instance=True):
-        """Deserializes a given object, i.e. converts references to other
+        """Deserialize a given object, i.e. convert references to other
         (known) `Document` objects by lazy instances of the corresponding
         class. This allows the automatic fetching of related documents from the
         database as required.
@@ -414,10 +426,11 @@ class Backend(object):
         deserialize=True,
         db_loader=None,
     ):
-        """Creates an instance of a `Document` class corresponding to the given
+        """Create an instance of a `Document` class corresponding to the given
         collection name or class.
 
-        :param collection_or_class: The name of the collection or a reference to the class for which to create an instance.
+        :param collection_or_class: The name of the collection or a reference
+            to the class for which to create an instance.
         :param attributes: The attributes of the instance to be created
         :param lazy: Whether to create a `lazy` object or not.
 

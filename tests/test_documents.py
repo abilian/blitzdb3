@@ -33,14 +33,14 @@ def test_unicode():
 
 def test_basic_attributes():
 
-    attributes = {"foo": "bar", "baz": 1243, "d": {1: 3, 4: 5}, "l": [1, 2, 3, 4]}
+    attributes = {"foo": "bar", "baz": 1243, "d": {1: 3, 4: 5}, "ll": [1, 2, 3, 4]}
 
     doc = Document(attributes)
 
     assert doc.foo == "bar"
     assert doc.baz == 1243
     assert doc.d == {1: 3, 4: 5}
-    assert doc.l == [1, 2, 3, 4]
+    assert doc.ll == [1, 2, 3, 4]
     assert doc.foo == doc["foo"]
     assert doc.baz == doc["baz"]
     assert doc.d == doc["d"]
