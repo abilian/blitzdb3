@@ -15,7 +15,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license='MIT',
-    entry_points={},
     url='https://github.com/abilian/blitzdb3',
     packages=find_packages(),
     install_requires=['six'],

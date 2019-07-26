@@ -36,12 +36,12 @@ The detailed documentation for this project is hosted on [ReadTheDocs](http://bl
 
 ## Roadmap
 
-* 0.2 (unreleased): keep fixing and upgrading.
-* 1.0 (unreleased): drop support for Python 2.
+* 3.2 (unreleased): keep fixing and upgrading.
+* 3.1 (unreleased): drop support for Python 2.
 
 ## Changelog
 
-* 0.1.0: Port to Python 3 using six. Cleanup and format code. 
+* 3.0a1: Port to Python 3 using six. Cleanup and format code. 
 
 ## Old Changelog (original Blitzdb by Andreas Dewes / andreas@7scientists.com)
 
@@ -72,15 +72,16 @@ The detailed documentation for this project is hosted on [ReadTheDocs](http://bl
 
 ## Contributors (in alphabetical order)
 
-### Original author (BlitzDB)
-
-* Andreas Dewes - @adewes
-
 ### Current maintainer (BlitzDB3)
 
 * Stefane Fermigier - @sfermigier
 
-### 
+### Original author (BlitzDB)
+
+* Andreas Dewes - @adewes
+
+### Original contributors
+
 *  @bwiessneth
 *  Florian Lehmann - @cashaddy
 *  Karskrin - @cBrauge
