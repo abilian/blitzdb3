@@ -4,7 +4,7 @@ from setuptools import find_packages
 with open("README.md") as fh:
     long_description = fh.read()
 
-VERSION = "3.0a1"
+VERSION = "3.0a2"
 
 setup(
     name='blitzdb3',
