@@ -605,7 +605,7 @@ class Backend(BaseBackend):
 
             elif isinstance(q, Document):
                 collection = self.get_collection_for_obj(q)
-                ref = "%s:%s" % (collection, q.pk)
+                ref = "{}:{}".format(collection, q.pk)
                 return ref
 
             else:

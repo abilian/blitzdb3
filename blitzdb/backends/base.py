@@ -172,7 +172,7 @@ class Backend(object):
 
         else:
             logger.debug(
-                "Registering class %s under collection %s" % (cls, collection_name)
+                "Registering class {} under collection {}".format(cls, collection_name)
             )
             register_class(collection_name, cls)
             return True
@@ -342,7 +342,7 @@ class Backend(object):
                             }
                         }
                     else:
-                        ref = "%s:%s" % (
+                        ref = "{}:{}".format(
                             self.classes[obj.__class__]["collection"],
                             str(obj.pk),
                         )

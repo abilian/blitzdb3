@@ -369,7 +369,7 @@ class Backend(BaseBackend):
                     return q.pk
 
                 else:
-                    return "%s:%s" % (collection, q.pk)
+                    return "{}:{}".format(collection, q.pk)
 
             else:
                 return q

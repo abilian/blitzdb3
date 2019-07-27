@@ -156,7 +156,7 @@ class Backend(BaseBackend):
             return self._table_columns[collection][key]["column"]
 
         except KeyError:
-            raise KeyError("Invalid key %s for collection %s" % (key, collection))
+            raise KeyError("Invalid key {} for collection {}".format(key, collection))
 
     def get_relationship_table(self, cls_or_collection, field):
         if isinstance(cls_or_collection, six.string_types):
@@ -260,7 +260,7 @@ class Backend(BaseBackend):
             }
 
             if backref is None:
-                backref_key = field.backref or "related_%s_%s" % (
+                backref_key = field.backref or "related_{}_{}".format(
                     collection,
                     column_name,
                 )
@@ -297,8 +297,8 @@ class Backend(BaseBackend):
                 column_name,
                 self.get_field_type(related_class.Meta.PkType),
                 ForeignKey(
-                    "%s%s.pk" % (related_collection, self.table_postfix),
-                    name="%s_%s_%s" % (collection, related_collection, column_name),
+                    "{}{}.pk".format(related_collection, self.table_postfix),
+                    name="{}_{}_{}".format(collection, related_collection, column_name),
                     ondelete=field.ondelete
                     if field.ondelete is not None
                     else self._ondelete,
@@ -324,11 +324,11 @@ class Backend(BaseBackend):
             extra_columns.append(column)
 
             if field.unique:
-                name = "unique_%s_%s" % (collection, column_name)
+                name = "unique_{}_{}".format(collection, column_name)
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
             if backref is None:
-                backref_key = field.backref or "related_%s_%s" % (
+                backref_key = field.backref or "related_{}_{}".format(
                     collection,
                     column_name,
                 )
@@ -373,7 +373,7 @@ class Backend(BaseBackend):
             ):  # this can happen if we connect a given table with itself
                 related_pk_field_name = related_pk_field_name + "_right"
 
-            relationship_name = "%s_%s_%s" % (
+            relationship_name = "{}_{}_{}".format(
                 collection,
                 related_collection,
                 column_name,
@@ -398,18 +398,18 @@ class Backend(BaseBackend):
                     UniqueConstraint(
                         pk_field_name,
                         related_pk_field_name,
-                        name="%s_%s_unique" % (relationship_name, column_name),
+                        name="{}_{}_unique".format(relationship_name, column_name),
                     )
                 ]
                 relationship_table = Table(
-                    "%s%s" % (relationship_name, self.table_postfix),
+                    "{}{}".format(relationship_name, self.table_postfix),
                     self._metadata,
                     Column(
                         related_pk_field_name,
                         self.get_field_type(related_class.Meta.PkType),
                         ForeignKey(
-                            "%s%s.pk" % (related_collection, self.table_postfix),
-                            name="%s_%s" % (relationship_name, related_pk_field_name),
+                            "{}{}.pk".format(related_collection, self.table_postfix),
+                            name="{}_{}".format(relationship_name, related_pk_field_name),
                             ondelete=field.ondelete
                             if field.ondelete is not None
                             else self._ondelete,
@@ -421,8 +421,8 @@ class Backend(BaseBackend):
                         pk_field_name,
                         self.get_field_type(cls.Meta.PkType),
                         ForeignKey(
-                            "%s%s.pk" % (collection, self.table_postfix),
-                            name="%s_%s" % (relationship_name, pk_field_name),
+                            "{}{}.pk".format(collection, self.table_postfix),
+                            name="{}_{}".format(relationship_name, pk_field_name),
                             ondelete=field.ondelete
                             if field.ondelete is not None
                             else self._ondelete,
@@ -439,7 +439,7 @@ class Backend(BaseBackend):
             self._related_fields[collection][field_name] = params
 
             if backref is None:
-                backref_key = field.backref or "related_%s_%s" % (
+                backref_key = field.backref or "related_{}_{}".format(
                     collection,
                     column_name,
                 )
@@ -473,12 +473,12 @@ class Backend(BaseBackend):
                     )
                 )
 
-                backref_name_left = "%s_%s_%s" % (
+                backref_name_left = "{}_{}_{}".format(
                     collection,
                     related_collection,
                     column_name,
                 )
-                backref_name_right = "%s_%s_%s" % (
+                backref_name_right = "{}_{}_{}".format(
                     related_collection,
                     collection,
                     column_name,
@@ -516,7 +516,7 @@ class Backend(BaseBackend):
                 "field": field,
                 "key": key,
                 "type": self.get_field_type(
-                    field, name="%s_%s" % (collection, column_name)
+                    field, name="{}_{}".format(collection, column_name)
                 ),
                 "column": column_name,
             }
@@ -547,7 +547,7 @@ class Backend(BaseBackend):
             )
 
             if field.unique:
-                name = "unique_%s_%s" % (collection, column_name)
+                name = "unique_{}_{}".format(collection, column_name)
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
         # if not primary key field is defined, we add one
@@ -560,7 +560,7 @@ class Backend(BaseBackend):
 
         for key, field in cls.fields.items():
             if not isinstance(field, BaseField):
-                raise AttributeError("Not a valid field: %s = %s" % (key, field))
+                raise AttributeError("Not a valid field: {} = {}".format(key, field))
 
             if isinstance(field, ForeignKeyField):
                 add_foreign_key_field(collection, cls, key, field)
@@ -574,12 +574,12 @@ class Backend(BaseBackend):
         if "unique_together" in meta_attributes:
             for keys in meta_attributes["unique_together"]:
                 columns = [self.get_column_for_key(collection, key) for key in keys]
-                name = "unique_together_%s_%s" % (collection, "_".join(columns))
+                name = "unique_together_{}_{}".format(collection, "_".join(columns))
                 extra_columns.append(UniqueConstraint(*columns, name=name))
 
         if table is None:
             table = Table(
-                "%s%s" % (collection, self.table_postfix),
+                "{}{}".format(collection, self.table_postfix),
                 self._metadata,
                 Column("data", LargeBinary),
                 *extra_columns
@@ -1856,11 +1856,9 @@ class Backend(BaseBackend):
 
                                         if query[0].__class__ is params["class"]:
                                             if any(
-                                                (
                                                     element.__class__
                                                     is not params["class"]
                                                     for element in query
-                                                )
                                             ):
                                                 raise AttributeError(
                                                     "Invalid document type in ForeignKey query"
