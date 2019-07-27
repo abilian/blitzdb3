@@ -52,7 +52,7 @@ class QuerySet(BaseQuerySet):
         self.intersects = intersects
         self.objects = objects
         if self.objects:
-            self.pop_objects = self.objects[:]
+            self.pop_objects = list(self.objects)[:]
 
         self.order_bys = order_bys
 
@@ -429,7 +429,7 @@ class QuerySet(BaseQuerySet):
             replace_ordered_dicts(unpacked_obj)
             for unpacked_obj in unpacked_objects.values()
         ]
-        self.pop_objects = self.objects[:]
+        self.pop_objects = list(self.objects)[:]
 
     def as_list(self):
         if self.deserialized_objects is None:
