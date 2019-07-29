@@ -343,8 +343,7 @@ class Backend(object):
                         }
                     else:
                         ref = "{}:{}".format(
-                            self.classes[obj.__class__]["collection"],
-                            str(obj.pk),
+                            self.classes[obj.__class__]["collection"], str(obj.pk)
                         )
                         output_obj = {
                             "__ref__": ref,

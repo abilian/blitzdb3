@@ -28,12 +28,16 @@ __pycache__
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
-.tox
+.coverage/
+.tox/
+.pytest_cache/
 nosetests.xml
 
 # Translations
 *.mo
+
+# PyCharm
+.idea
 
 # Mr Developer
 .mr.developer.cfg

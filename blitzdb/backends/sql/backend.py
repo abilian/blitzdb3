@@ -261,8 +261,7 @@ class Backend(BaseBackend):
 
             if backref is None:
                 backref_key = field.backref or "related_{}_{}".format(
-                    collection,
-                    column_name,
+                    collection, column_name
                 )
                 params["backref"] = add_foreign_key_field(
                     related_collection,
@@ -275,7 +274,6 @@ class Backend(BaseBackend):
             self._related_fields[collection][field_name] = params
 
         def add_foreign_key_field(collection, cls, key, field, backref=None):
-
             if key in self._related_fields[collection]:
                 raise AttributeError(
                     (
@@ -329,8 +327,7 @@ class Backend(BaseBackend):
 
             if backref is None:
                 backref_key = field.backref or "related_{}_{}".format(
-                    collection,
-                    column_name,
+                    collection, column_name
                 )
                 params["backref"] = add_one_to_many_field(
                     related_collection,
@@ -343,7 +340,6 @@ class Backend(BaseBackend):
             return params
 
         def add_many_to_many_field(collection, cls, key, field, backref=None):
-
             if isinstance(field.related, (list, tuple)):
                 raise AttributeError("Currently not supported!")
 
@@ -374,9 +370,7 @@ class Backend(BaseBackend):
                 related_pk_field_name = related_pk_field_name + "_right"
 
             relationship_name = "{}_{}_{}".format(
-                collection,
-                related_collection,
-                column_name,
+                collection, related_collection, column_name
             )
 
             params = {
@@ -409,7 +403,9 @@ class Backend(BaseBackend):
                         self.get_field_type(related_class.Meta.PkType),
                         ForeignKey(
                             "{}{}.pk".format(related_collection, self.table_postfix),
-                            name="{}_{}".format(relationship_name, related_pk_field_name),
+                            name="{}_{}".format(
+                                relationship_name, related_pk_field_name
+                            ),
                             ondelete=field.ondelete
                             if field.ondelete is not None
                             else self._ondelete,
@@ -440,8 +436,7 @@ class Backend(BaseBackend):
 
             if backref is None:
                 backref_key = field.backref or "related_{}_{}".format(
-                    collection,
-                    column_name,
+                    collection, column_name
                 )
                 params["backref"] = add_many_to_many_field(
                     related_collection,
@@ -474,14 +469,10 @@ class Backend(BaseBackend):
                 )
 
                 backref_name_left = "{}_{}_{}".format(
-                    collection,
-                    related_collection,
-                    column_name,
+                    collection, related_collection, column_name
                 )
                 backref_name_right = "{}_{}_{}".format(
-                    related_collection,
-                    collection,
-                    column_name,
+                    related_collection, collection, column_name
                 )
                 if backref_name_left == backref_name_right:
                     backref_name_right += "_right"
@@ -494,7 +485,8 @@ class Backend(BaseBackend):
 
                 field.relationship_class = RelationshipClass
 
-                # we append the class to the list of relationship classes so we can unregister it later
+                # we append the class to the list of relationship classes
+                # so we can unregister it later.
                 # this is important when calling init_schema more than once...
                 self._relationship_classes.append(RelationshipClass)
 
@@ -536,7 +528,8 @@ class Backend(BaseBackend):
             if field.server_default is not None:
                 default_value = field.server_default
                 # if the value is not a string or a clause, we convert it to a literal value
-                # this will take care to e.g. represent booleans correctly for the underlying database engine
+                # this will take care to e.g. represent booleans correctly
+                # for the underlying database engine
                 if not isinstance(default_value, six.string_types) and not isinstance(
                     default_value, expression.ClauseElement
                 ):
@@ -654,7 +647,6 @@ class Backend(BaseBackend):
         self._metadata.drop_all(self.engine, checkfirst=True)
 
     def delete(self, obj):
-
         self.call_hook("before_delete", obj)
 
         if obj.pk == None:
@@ -663,7 +655,6 @@ class Backend(BaseBackend):
         self.filter(obj.__class__, {"pk": obj.pk}).delete()
 
     def update(self, obj, set_fields=None, unset_fields=None, update_obj=True):
-
         if obj.pk is None:
             raise obj.DoesNotExist("Trying to update a document without a primary key!")
 
@@ -735,7 +726,6 @@ class Backend(BaseBackend):
         inserts = []
 
         with self.transaction(implicit=True):
-
             data_set_keys = {}
             data_unset_keys = set()
             update_dict = {}
@@ -831,7 +821,6 @@ class Backend(BaseBackend):
         return {}
 
     def _serialize_and_update_indexes(self, obj, collection, d, for_update=False):
-
         pk_type = self._index_fields[collection]["pk"]["type"]
 
         for index_field, index_params in self._index_fields[collection].items():
@@ -881,7 +870,6 @@ class Backend(BaseBackend):
         for_update=False,
         save_cache=None,
     ):
-
         pk_type = self._index_fields[collection]["pk"]["type"]
 
         for related_field, relation_params in self._related_fields[collection].items():
@@ -971,7 +959,6 @@ class Backend(BaseBackend):
                     d[relation_params["column"]] = null()
 
     def save(self, obj, autosave_dependent=True, call_hook=True, save_cache=None):
-
         if save_cache is None:
             save_cache = []
 
@@ -1058,7 +1045,6 @@ class Backend(BaseBackend):
             raise
 
     def initialize_relations(self, obj, data=None):
-
         if data is None:
             data = obj.attributes
 
@@ -1169,7 +1155,6 @@ class Backend(BaseBackend):
         obj.attributes = data
 
     def get_include_joins(self, cls, includes, excludes=None, order_by_keys=None):
-
         collection = self.get_collection_for_cls(cls)
 
         include_params = {
@@ -1183,7 +1168,7 @@ class Backend(BaseBackend):
         include_list = [include_params]
 
         def include_related_field(d, key, params):
-            if not key in d["joins"]:
+            if key not in d["joins"]:
                 d["joins"][key] = {
                     "relation": params,
                     "table": self._collection_tables[params["collection"]],
@@ -1289,14 +1274,12 @@ class Backend(BaseBackend):
         return include_params
 
     def map_index_fields(self, collection_or_class, attributes):
-
-        incomplete = False
-
         if isinstance(collection_or_class, six.string_types):
             collection = collection_or_class
         else:
             collection = self.get_collection_for_cls(collection_or_class)
 
+        incomplete = False
         data = {}
         for field_name, params in self._index_fields[collection].items():
             if not params["column"] in attributes:
@@ -1336,12 +1319,6 @@ class Backend(BaseBackend):
     def create_instance(
         self, cls_or_collection, attributes, lazy=False, db_loader=None
     ):
-
-        if not isinstance(cls_or_collection, six.string_types):
-            collection = self.get_collection_for_cls(cls_or_collection)
-        else:
-            collection = cls_or_collection
-
         # first, we create an object without attributes
         obj = super(Backend, self).create_instance(
             cls_or_collection,
@@ -1368,7 +1345,6 @@ class Backend(BaseBackend):
         self.db[collection].ensure_index(*args, **kwargs)
 
     def get(self, cls_or_collection, query, raw=False, only=None, include=None):
-
         if not isinstance(cls_or_collection, six.string_types):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
@@ -1393,12 +1369,13 @@ class Backend(BaseBackend):
         """Filter objects from the database that correspond to a given set of
         properties.
 
-        See :py:meth:`blitzdb.backends.base.Backend.filter` for documentation of individual parameters
+        See :py:meth:`blitzdb.backends.base.Backend.filter` for documentation
+        of individual parameters
 
         .. note::
 
-            This function supports all query operators that are available in SQLAlchemy and returns a query set
-            that is based on a SQLAlchemy cursor.
+            This function supports all query operators that are available in SQLAlchemy
+            and returns a query set that is based on a SQLAlchemy cursor.
         """
 
         if not isinstance(cls_or_collection, six.string_types):
@@ -1856,9 +1833,8 @@ class Backend(BaseBackend):
 
                                         if query[0].__class__ is params["class"]:
                                             if any(
-                                                    element.__class__
-                                                    is not params["class"]
-                                                    for element in query
+                                                element.__class__ is not params["class"]
+                                                for element in query
                                             ):
                                                 raise AttributeError(
                                                     "Invalid document type in ForeignKey query"
