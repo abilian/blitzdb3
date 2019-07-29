@@ -9,3 +9,8 @@ format:
 
 lint:
 	flake8 blitzdb tests
+
+release:
+	rm -rf dist/
+	python setup.py sdist
+	twine upload dist/*
