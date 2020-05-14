@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 language: python
 sudo: false
 addons:
@@ -6,10 +6,6 @@ addons:
 
 services:
   - mongodb
-
-before_script:
-  - psql -c 'create database blitzdb_test;' -U postgres
-  - sleep 3
 
 env:
   - BLITZDB_SQLALCHEMY_URL: "postgres://postgres@localhost/blitzdb_test"
@@ -19,13 +15,16 @@ python:
   - "2.7"
   - "3.6"
   - "3.7"
+  - "3.8"
 
-# command to install dependencies
 install:
-  - pip install .
-  - pip install -r requirements-travis.txt
-  - echo $BLITZDB_SQLALCHEMY_URL
+  - pip install poetry
 
 # command to run tests
+before_script:
+  - psql -c 'create database blitzdb_test;' -U postgres
+  - sleep 3
+
 script:
-  - pytest
+  - echo $BLITZDB_SQLALCHEMY_URL
+  - tox

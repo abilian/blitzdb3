@@ -1,0 +1,21 @@
+[tool]
+[tool.poetry]
+name = "blitzdb3"
+version = "3.0a4"
+description = "A document-oriented database written purely in Python (Python 3 fork)."
+license = "MIT"
+homepage = "https://github.com/abilian/blitzdb3"
+authors = ["Stefane Fermigier - Abilian <sf@abilian.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">3.6"
+
+six = "*"
+
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"
+flake8-mutable = "*"
+flake8-tidy-imports = "*"
+mccabe = "*"
