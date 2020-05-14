@@ -3,7 +3,7 @@ test:
 
 format:
 	isort -a  "from __future__ import absolute_import, print_function, unicode_literals" \
-                -rc tests blitzdb
+	        -rc tests blitzdb
 	black blitzdb tests
 	isort -rc tests blitzdb
 
@@ -14,3 +14,22 @@ release:
 	rm -rf dist/
 	python setup.py sdist
 	twine upload dist/*
+
+
+#
+# Cleanup
+#
+clean:
+	find . -name "*.pyc" -delete
+	find . -name .DS_Store -delete
+	find . -name cache -type d -delete
+	find . -type d -empty -delete
+	rm -rf .mypy_cache
+	rm -f migration.log
+	rm -rf build dist
+	rm -rf *.egg .coverage
+	rm -rf doc/_build
+	rm -rf htmlcov
+
+tidy: clean
+	rm -rf .tox .nox

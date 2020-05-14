@@ -1,9 +1,0 @@
-# For additional backends
-sqlalchemy<1.2
-psycopg2-binary
-alembic
-pymongo>=3.0.1
-
-# For tests
-Faker==0.7.7
-pytest>=2.5.0
