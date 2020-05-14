@@ -2,8 +2,6 @@ import copy
 import logging
 import uuid
 
-import six
-
 from blitzdb.fields import CharField
 from blitzdb.fields.base import BaseField
 

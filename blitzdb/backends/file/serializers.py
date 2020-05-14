@@ -7,8 +7,6 @@ as well as a cPickle serializer.
 import json
 import pickle as cPickle
 
-import six
-
 from .utils import JsonEncoder
 
 

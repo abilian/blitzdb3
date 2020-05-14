@@ -4,7 +4,6 @@ import uuid
 from collections import defaultdict
 
 import pymongo
-import six
 
 from blitzdb.backends.base import Backend as BaseBackend
 from blitzdb.backends.base import NotInTransaction

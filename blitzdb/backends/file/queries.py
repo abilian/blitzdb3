@@ -2,9 +2,7 @@
 
 import operator
 import re
-
-import six
-from six.moves import reduce
+from functools import reduce as reduce
 
 
 def boolean_operator_query(boolean_operator):

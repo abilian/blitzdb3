@@ -5,7 +5,6 @@ import uuid
 from collections import defaultdict
 from types import LambdaType
 
-import six
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import Column, ForeignKey, MetaData, Table, \
     UniqueConstraint

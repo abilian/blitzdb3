@@ -1,7 +1,6 @@
 import copy
 
 import pytest
-import six
 
 from blitzdb import Document
 

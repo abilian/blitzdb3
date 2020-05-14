@@ -3,8 +3,6 @@ import copy
 import inspect
 import logging
 
-import six
-
 from blitzdb.document import Document, document_classes
 
 logger = logging.getLogger(__name__)
@@ -256,18 +254,7 @@ class Backend:
             obj = encoder.encode(obj, path=path)
 
         def encode_as_str(obj):
-            if six.PY3:
-                return str(obj)
-
-            else:
-                if isinstance(obj, str):
-                    return obj
-
-                elif isinstance(obj, str):
-                    return str(obj)
-
-                else:
-                    return str(str(obj), errors="replace")
+            return str(obj)
 
         if isinstance(obj, dict):
             output_obj = {}

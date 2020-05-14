@@ -1,7 +1,6 @@
 import copy
 from collections import OrderedDict
 
-import six
 import sqlalchemy
 from sqlalchemy.sql import expression, func, select
 from sqlalchemy.sql.expression import asc, desc, nullsfirst, nullslast, \
@@ -108,8 +107,6 @@ class QuerySet(BaseQuerySet):
     def next(self):
         if self._it is None:
             self._it = iter(self)
-        if six.PY2:
-            return next(self._it)
 
         return self._it.__next__()
 

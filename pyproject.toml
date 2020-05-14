@@ -7,11 +7,12 @@ license = "MIT"
 homepage = "https://github.com/abilian/blitzdb3"
 authors = ["Stefane Fermigier - Abilian <sf@abilian.com>"]
 readme = "README.md"
+packages = [
+  { include="blitzdb" },
+]
 
 [tool.poetry.dependencies]
 python = ">3.6"
-
-six = "*"
 
 
 [tool.poetry.dev-dependencies]

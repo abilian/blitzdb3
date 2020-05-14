@@ -3,8 +3,6 @@ import os.path
 import uuid
 from collections import defaultdict
 
-import six
-
 import blitzdb
 from blitzdb.backends.base import Backend as BaseBackend
 from blitzdb.backends.base import NotInTransaction

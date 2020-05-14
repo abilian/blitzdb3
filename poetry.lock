@@ -284,7 +284,7 @@ python-versions = "*"
 version = "1.0.4"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -331,7 +331,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "6e2df09751f5743ea1371c01071424a26189b9c937f8020951bd831b82625e7e"
+content-hash = "cf9144194513edd545668487eca04ad49446175ea5dd55f003e8997e018edc9a"
 python-versions = ">3.6"
 
 [metadata.files]
