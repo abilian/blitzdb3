@@ -78,7 +78,7 @@ class Backend(BaseBackend):
         table_postfix="",
         ondelete="CASCADE",
         create_schema=False,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 
@@ -424,7 +424,7 @@ class Backend(BaseBackend):
                         ),
                         index=True,
                     ),
-                    *extra_columns
+                    *extra_columns,
                 )
 
             params["relationship_table"] = relationship_table
@@ -505,9 +505,7 @@ class Backend(BaseBackend):
             index_params = {
                 "field": field,
                 "key": key,
-                "type": self.get_field_type(
-                    field, name=f"{collection}_{column_name}"
-                ),
+                "type": self.get_field_type(field, name=f"{collection}_{column_name}"),
                 "column": column_name,
             }
             self._index_fields[collection][key] = index_params
@@ -573,7 +571,7 @@ class Backend(BaseBackend):
                 f"{collection}{self.table_postfix}",
                 self._metadata,
                 Column("data", LargeBinary),
-                *extra_columns
+                *extra_columns,
             )
         self._collection_tables[collection] = table
 

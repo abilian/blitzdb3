@@ -5,12 +5,11 @@ as well as a cPickle serializer.
 """
 
 import json
+import pickle as cPickle
 
 import six
 
 from .utils import JsonEncoder
-
-import pickle as cPickle
 
 
 class JsonSerializer:
@@ -27,7 +26,6 @@ class JsonSerializer:
     @classmethod
     def deserialize(cls, data):
         return json.loads(data.decode("utf-8"))
-
 
 
 class PickleSerializer:

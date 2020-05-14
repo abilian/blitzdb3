@@ -99,9 +99,7 @@ class TransactionalStore(Store):
 
     def store_blob(self, blob, key, *args, **kwargs):
         if not self._enabled:
-            return super().store_blob(
-                blob, key, *args, **kwargs
-            )
+            return super().store_blob(blob, key, *args, **kwargs)
 
         if key in self._delete_cache:
             self._delete_cache.remove(key)

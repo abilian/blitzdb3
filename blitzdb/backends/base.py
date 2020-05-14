@@ -169,9 +169,7 @@ class Backend:
                 return True
 
         else:
-            logger.debug(
-                f"Registering class {cls} under collection {collection_name}"
-            )
+            logger.debug(f"Registering class {cls} under collection {collection_name}")
             register_class(collection_name, cls)
             return True
 
@@ -248,7 +246,7 @@ class Backend:
                 convert_keys_to_str=convert_keys_to_str,
                 autosave=autosave,
                 for_query=for_query,
-                **kwargs
+                **kwargs,
             )
 
         if encoders is None:
