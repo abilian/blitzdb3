@@ -12,13 +12,12 @@ env:
   - BLITZDB_SQLALCHEMY_URL: "sqlite:///:memory:"
 
 python:
-  - "2.7"
   - "3.6"
   - "3.7"
   - "3.8"
 
 install:
-  - pip install poetry
+  - pip install -U pip setuptools wheel tox tox-travis poetry
 
 # command to run tests
 before_script:
