@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import copy
 import logging
 import uuid
@@ -12,14 +10,13 @@ from blitzdb.fields.base import BaseField
 logger = logging.getLogger(__name__)
 
 
-if six.PY3:
-    six.text_type = str
+str = str
 
 
 class DoesNotExist(BaseException):
     def __str__(self):
         message = BaseException.__str__(self)
-        return "DoesNotExist({}): {}".format(self.__class__.__name__, message)
+        return f"DoesNotExist({self.__class__.__name__}): {message}"
 
 
 class MultipleDocumentsReturned(BaseException):
@@ -84,8 +81,7 @@ class MetaDocument(type):
 document_classes = []
 
 
-@six.add_metaclass(MetaDocument)
-class Document(object):
+class Document(metaclass=MetaDocument):
 
     """The Document object is the base class for all documents stored in the
     database. The name of the collection can be set by defining a
@@ -186,7 +182,7 @@ class Document(object):
 
     def __getitem__(self, key):
         try:
-            lazy = super(Document, self).__getattribute__("_lazy")
+            lazy = super().__getattribute__("_lazy")
         except AttributeError:
             lazy = False
         if lazy:
@@ -250,8 +246,7 @@ class Document(object):
         )
 
     def __iter__(self):
-        for key in self.keys():
-            yield key
+        yield from self.keys()
 
     def get_lazy_attribute(self, key):
         # we make sure not to revert the document...
@@ -259,7 +254,7 @@ class Document(object):
 
     def __getattr__(self, key, load_if_lazy=True):
         try:
-            return super(Document, self).__getattr__(key)
+            return super().__getattr__(key)
 
         except AttributeError:
             pass
@@ -279,14 +274,14 @@ class Document(object):
 
     def __setattr__(self, key, value):
         if key.startswith("_") or key in ("attributes", "pk", "lazy", "backend"):
-            return super(Document, self).__setattr__(key, value)
+            return super().__setattr__(key, value)
 
         else:
             self.attributes[key] = value
 
     def __delattr__(self, key):
         if key.startswith("_"):
-            return super(Document, self).__delattr__(key)
+            return super().__delattr__(key)
 
         try:
             del self.attributes[key]
@@ -356,12 +351,7 @@ class Document(object):
             self.get_pk_name(), self.pk, self._lazy
         )
 
-    if six.PY3:
-        __str__ = __unicode__
-    else:
-
-        def __str__(self):
-            return six.text_type(self).encode("utf-8")
+    __str__ = __unicode__
 
     def _represent(self, n=1):
 

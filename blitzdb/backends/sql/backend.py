@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import logging
 import re
 import sys
@@ -35,7 +33,7 @@ def compile_binary_sqlite(type_, compiler, **kw):
     return "VARCHAR(64)"
 
 
-class ExcludedFieldsEncoder(object):
+class ExcludedFieldsEncoder:
     def __init__(self, backend, collection):
         self.collection = collection
         self.backend = backend
@@ -82,7 +80,7 @@ class Backend(BaseBackend):
         create_schema=False,
         **kwargs
     ):
-        super(Backend, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self._engine_getter = engine
         self._engine = None
@@ -148,7 +146,7 @@ class Backend(BaseBackend):
         raise AttributeError("Invalid field type: %s" % field)
 
     def get_column_for_key(self, cls_or_collection, key):
-        if isinstance(cls_or_collection, six.string_types):
+        if isinstance(cls_or_collection, str):
             collection = cls_or_collection
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
@@ -156,31 +154,31 @@ class Backend(BaseBackend):
             return self._table_columns[collection][key]["column"]
 
         except KeyError:
-            raise KeyError("Invalid key {} for collection {}".format(key, collection))
+            raise KeyError(f"Invalid key {key} for collection {collection}")
 
     def get_relationship_table(self, cls_or_collection, field):
-        if isinstance(cls_or_collection, six.string_types):
+        if isinstance(cls_or_collection, str):
             collection = cls_or_collection
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
         return self._relationship_tables[collection][field]
 
     def get_table(self, cls_or_collection):
-        if isinstance(cls_or_collection, six.string_types):
+        if isinstance(cls_or_collection, str):
             collection = cls_or_collection
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
         return self._collection_tables[collection]
 
     def get_table_columns(self, cls_or_collection):
-        if isinstance(cls_or_collection, six.string_types):
+        if isinstance(cls_or_collection, str):
             collection = cls_or_collection
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
         return self._table_columns[collection]
 
     def get_key_for_column(self, cls_or_collection, key):
-        if isinstance(cls_or_collection, six.string_types):
+        if isinstance(cls_or_collection, str):
             collection = cls_or_collection
         else:
             collection = self.get_collection_for_cls(cls_or_collection)
@@ -241,7 +239,7 @@ class Backend(BaseBackend):
                     )
                 )
 
-            if isinstance(field.related, six.string_types):
+            if isinstance(field.related, str):
                 related_collection = self.get_collection_for_cls_name(field.related)
             else:
                 related_collection = self.get_collection_for_cls(field.related)
@@ -286,7 +284,7 @@ class Backend(BaseBackend):
             field_name = key
             column_name = key.replace(".", "_")
             self._excluded_keys[collection][key] = True
-            if isinstance(field.related, six.string_types):
+            if isinstance(field.related, str):
                 related_collection = self.get_collection_for_cls_name(field.related)
             else:
                 related_collection = self.get_collection_for_cls(field.related)
@@ -295,8 +293,8 @@ class Backend(BaseBackend):
                 column_name,
                 self.get_field_type(related_class.Meta.PkType),
                 ForeignKey(
-                    "{}{}.pk".format(related_collection, self.table_postfix),
-                    name="{}_{}_{}".format(collection, related_collection, column_name),
+                    f"{related_collection}{self.table_postfix}.pk",
+                    name=f"{collection}_{related_collection}_{column_name}",
                     ondelete=field.ondelete
                     if field.ondelete is not None
                     else self._ondelete,
@@ -322,7 +320,7 @@ class Backend(BaseBackend):
             extra_columns.append(column)
 
             if field.unique:
-                name = "unique_{}_{}".format(collection, column_name)
+                name = f"unique_{collection}_{column_name}"
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
             if backref is None:
@@ -356,7 +354,7 @@ class Backend(BaseBackend):
             column_name = key.replace(".", "_")
             self._excluded_keys[collection][key] = True
 
-            if isinstance(field.related, six.string_types):
+            if isinstance(field.related, str):
                 related_collection = self.get_collection_for_cls_name(field.related)
             else:
                 related_collection = self.get_collection_for_cls(field.related)
@@ -392,17 +390,17 @@ class Backend(BaseBackend):
                     UniqueConstraint(
                         pk_field_name,
                         related_pk_field_name,
-                        name="{}_{}_unique".format(relationship_name, column_name),
+                        name=f"{relationship_name}_{column_name}_unique",
                     )
                 ]
                 relationship_table = Table(
-                    "{}{}".format(relationship_name, self.table_postfix),
+                    f"{relationship_name}{self.table_postfix}",
                     self._metadata,
                     Column(
                         related_pk_field_name,
                         self.get_field_type(related_class.Meta.PkType),
                         ForeignKey(
-                            "{}{}.pk".format(related_collection, self.table_postfix),
+                            f"{related_collection}{self.table_postfix}.pk",
                             name="{}_{}".format(
                                 relationship_name, related_pk_field_name
                             ),
@@ -417,8 +415,8 @@ class Backend(BaseBackend):
                         pk_field_name,
                         self.get_field_type(cls.Meta.PkType),
                         ForeignKey(
-                            "{}{}.pk".format(collection, self.table_postfix),
-                            name="{}_{}".format(relationship_name, pk_field_name),
+                            f"{collection}{self.table_postfix}.pk",
+                            name=f"{relationship_name}_{pk_field_name}",
                             ondelete=field.ondelete
                             if field.ondelete is not None
                             else self._ondelete,
@@ -508,7 +506,7 @@ class Backend(BaseBackend):
                 "field": field,
                 "key": key,
                 "type": self.get_field_type(
-                    field, name="{}_{}".format(collection, column_name)
+                    field, name=f"{collection}_{column_name}"
                 ),
                 "column": column_name,
             }
@@ -530,7 +528,7 @@ class Backend(BaseBackend):
                 # if the value is not a string or a clause, we convert it to a literal value
                 # this will take care to e.g. represent booleans correctly
                 # for the underlying database engine
-                if not isinstance(default_value, six.string_types) and not isinstance(
+                if not isinstance(default_value, str) and not isinstance(
                     default_value, expression.ClauseElement
                 ):
                     default_value = expression.literal(default_value)
@@ -540,7 +538,7 @@ class Backend(BaseBackend):
             )
 
             if field.unique:
-                name = "unique_{}_{}".format(collection, column_name)
+                name = f"unique_{collection}_{column_name}"
                 extra_columns.append(UniqueConstraint(column_name, name=name))
 
         # if not primary key field is defined, we add one
@@ -553,7 +551,7 @@ class Backend(BaseBackend):
 
         for key, field in cls.fields.items():
             if not isinstance(field, BaseField):
-                raise AttributeError("Not a valid field: {} = {}".format(key, field))
+                raise AttributeError(f"Not a valid field: {key} = {field}")
 
             if isinstance(field, ForeignKeyField):
                 add_foreign_key_field(collection, cls, key, field)
@@ -572,7 +570,7 @@ class Backend(BaseBackend):
 
         if table is None:
             table = Table(
-                "{}{}".format(collection, self.table_postfix),
+                f"{collection}{self.table_postfix}",
                 self._metadata,
                 Column("data", LargeBinary),
                 *extra_columns
@@ -922,13 +920,13 @@ class Backend(BaseBackend):
                     if value is None:
                         if not relation_params["field"].nullable:
                             raise AttributeError(
-                                "Field {} cannot be None!".format(related_field)
+                                f"Field {related_field} cannot be None!"
                             )
 
                         d[relation_params["column"]] = null()
                     elif not isinstance(value, Document):
                         raise AttributeError(
-                            "Field {} must be a document!".format(related_field)
+                            f"Field {related_field} must be a document!"
                         )
 
                     else:
@@ -1193,7 +1191,7 @@ class Backend(BaseBackend):
             else:
                 main_include = include
                 sub_includes = None
-            if not isinstance(main_include, six.string_types):
+            if not isinstance(main_include, str):
                 raise AttributeError(
                     "Invalid `include` argument: {}".format(str(main_include))
                 )
@@ -1274,7 +1272,7 @@ class Backend(BaseBackend):
         return include_params
 
     def map_index_fields(self, collection_or_class, attributes):
-        if isinstance(collection_or_class, six.string_types):
+        if isinstance(collection_or_class, str):
             collection = collection_or_class
         else:
             collection = self.get_collection_for_cls(collection_or_class)
@@ -1320,7 +1318,7 @@ class Backend(BaseBackend):
         self, cls_or_collection, attributes, lazy=False, db_loader=None
     ):
         # first, we create an object without attributes
-        obj = super(Backend, self).create_instance(
+        obj = super().create_instance(
             cls_or_collection,
             {},
             call_hook=False,
@@ -1338,14 +1336,14 @@ class Backend(BaseBackend):
         return obj
 
     def create_index(self, cls_or_collection, *args, **kwargs):
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
         else:
             collection = cls_or_collection
         self.db[collection].ensure_index(*args, **kwargs)
 
     def get(self, cls_or_collection, query, raw=False, only=None, include=None):
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
         else:
@@ -1378,7 +1376,7 @@ class Backend(BaseBackend):
             and returns a query set that is based on a SQLAlchemy cursor.
         """
 
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
         else:

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import copy
 
 import pytest
@@ -10,7 +8,7 @@ from blitzdb import Document
 
 @pytest.fixture
 def mockup_backend():
-    class Backend(object):
+    class Backend:
         def __init__(self):
             self.attributes = {"foo": "bar", "baz": 123}
 
@@ -25,10 +23,7 @@ def mockup_backend():
 def test_unicode():
 
     doc = Document({"pk": "foo"})
-    if six.PY2:
-        assert six.text_type(str(doc)) == six.text_type(doc)
-    else:
-        assert doc.__unicode__ == doc.__str__
+    assert doc.__unicode__ == doc.__str__
 
 
 def test_basic_attributes():

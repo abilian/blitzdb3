@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import abc
 import copy
 import inspect
@@ -27,7 +25,7 @@ class InTransaction(BaseException):
     transaction gets called inside a transaction."""
 
 
-class ComplexEncoder(object):
+class ComplexEncoder:
     @classmethod
     def encode(cls, obj, path):
         if isinstance(obj, complex):
@@ -43,7 +41,7 @@ class ComplexEncoder(object):
         return obj
 
 
-class ComplexQueryEncoder(object):
+class ComplexQueryEncoder:
     @classmethod
     def encode(cls, obj, path):
         if isinstance(obj, complex):
@@ -55,7 +53,7 @@ class ComplexQueryEncoder(object):
         return obj
 
 
-class Backend(object):
+class Backend:
 
     """Abstract base class for all backend implementations. Provides operations
     for querying the database, as well as for storing, updating and deleting
@@ -70,7 +68,7 @@ class Backend(object):
     settings and properties. Redefine it in your backend implementation to change the default values.
     """
 
-    class Meta(object):
+    class Meta:
         pass
 
     __metaclass__ = abc.ABCMeta
@@ -172,7 +170,7 @@ class Backend(object):
 
         else:
             logger.debug(
-                "Registering class {} under collection {}".format(cls, collection_name)
+                f"Registering class {cls} under collection {collection_name}"
             )
             register_class(collection_name, cls)
             return True
@@ -181,10 +179,7 @@ class Backend(object):
 
     def get_meta_attributes(self, cls):
         def get_user_attributes(cls):
-            if six.PY2:
-                boring = dir(type(b"dummy", (object,), {}))
-            else:
-                boring = dir(type("dummy", (object,), {}))
+            boring = dir(type("dummy", (object,), {}))
 
             return dict(
                 [item for item in inspect.getmembers(cls) if item[0] not in boring]
@@ -267,14 +262,14 @@ class Backend(object):
                 return str(obj)
 
             else:
-                if isinstance(obj, six.text_type):
+                if isinstance(obj, str):
                     return obj
 
                 elif isinstance(obj, str):
-                    return six.text_type(obj)
+                    return str(obj)
 
                 else:
-                    return six.text_type(str(obj), errors="replace")
+                    return str(str(obj), errors="replace")
 
         if isinstance(obj, dict):
             output_obj = {}
@@ -289,7 +284,7 @@ class Backend(object):
                 except DoNotSerialize:
                     pass
 
-        elif isinstance(obj, six.string_types):
+        elif isinstance(obj, str):
             output_obj = encode_as_str(obj)
 
         elif isinstance(obj, (list, tuple)):
@@ -480,7 +475,7 @@ class Backend(object):
         """This returns a context guard which will automatically open and close
         a transaction."""
 
-        class TransactionManager(object):
+        class TransactionManager:
             def __init__(self, backend, implicit=False):
                 self.backend = backend
                 self.implicit = implicit

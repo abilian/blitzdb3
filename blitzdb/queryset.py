@@ -1,9 +1,7 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import abc
 
 
-class QuerySet(object):
+class QuerySet:
 
     """Stores information about objects returned by a database query and
     retrieves instances of these objects if necessary.

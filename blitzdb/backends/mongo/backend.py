@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import logging
 import traceback
 import uuid
@@ -18,14 +16,14 @@ from .queryset import QuerySet
 logger = logging.getLogger(__name__)
 
 
-class DotEncoder(object):
+class DotEncoder:
 
     DOT_MAGIC_VALUE = ":a5b8afc131:"
 
     @classmethod
     def encode(cls, obj, path):
         def replace_key(key):
-            if isinstance(key, six.string_types):
+            if isinstance(key, str):
                 return key.replace(".", cls.DOT_MAGIC_VALUE)
 
             return key
@@ -69,7 +67,7 @@ class Backend(BaseBackend):
     standard_encoders = BaseBackend.standard_encoders + [DotEncoder]
 
     def __init__(self, db, autocommit=False, use_pk_based_refs=True, **kwargs):
-        super(Backend, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.db = db
         self._autocommit = autocommit
         self._save_cache = defaultdict(lambda: {})
@@ -280,7 +278,7 @@ class Backend(BaseBackend):
         path=None,
     ):
 
-        return super(Backend, self).serialize(
+        return super().serialize(
             obj,
             convert_keys_to_str=convert_keys_to_str,
             embed_level=embed_level,
@@ -303,7 +301,7 @@ class Backend(BaseBackend):
                 self.create_indexes(cls, meta_attributes["indexes"])
 
     def create_index(self, cls_or_collection, *args, **kwargs):
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
         else:
             collection = cls_or_collection
@@ -369,7 +367,7 @@ class Backend(BaseBackend):
                     return q.pk
 
                 else:
-                    return "{}:{}".format(collection, q.pk)
+                    return f"{collection}:{q.pk}"
 
             else:
                 return q
@@ -377,7 +375,7 @@ class Backend(BaseBackend):
         return transform_query(query)
 
     def get(self, cls_or_collection, properties, raw=False, only=None):
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
         else:
             collection = cls_or_collection
@@ -403,7 +401,7 @@ class Backend(BaseBackend):
             a query set that is based on a MongoDB cursor.
         """
 
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
         else:

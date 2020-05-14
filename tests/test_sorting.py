@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from blitzdb.backends.sql import Backend as SqlBackend
 
 from .helpers.movie_data import Actor

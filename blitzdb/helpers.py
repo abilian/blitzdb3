@@ -1,6 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
-
 def get_value(obj, key, create=False):
     key_fragments = key.split(".")
     current_dict = obj

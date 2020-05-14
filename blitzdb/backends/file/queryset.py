@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import copy
 
 from blitzdb.queryset import QuerySet as BaseQuerySet
@@ -39,7 +37,7 @@ class QuerySet(BaseQuerySet):
         return self
 
     def __init__(self, backend, cls, store, keys):
-        super(QuerySet, self).__init__(backend, cls)
+        super().__init__(backend, cls)
         self.store = store
         self.keys = list(keys)
         self.objects = {}

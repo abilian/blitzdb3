@@ -1,11 +1,9 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import copy
 import os
 import os.path
 
 
-class Store(object):
+class Store:
     """This class stores binary data in files."""
 
     def __init__(self, properties):
@@ -35,8 +33,8 @@ class Store(object):
             with open(self._get_path_for_key(key), "rb") as input_file:
                 return input_file.read()
 
-        except IOError:
-            raise KeyError("Key {} not found!".format(key))
+        except OSError:
+            raise KeyError(f"Key {key} not found!")
 
     def has_blob(self, key):
         if os.path.exists(self._get_path_for_key(key)):
@@ -59,7 +57,7 @@ class TransactionalStore(Store):
     """This class adds transaction support to the Store class."""
 
     def __init__(self, properties):
-        super(TransactionalStore, self).__init__(properties)
+        super().__init__(properties)
         self._enabled = True
         self.begin()
 
@@ -71,16 +69,16 @@ class TransactionalStore(Store):
         try:
             self._enabled = False
             for store_key in self._delete_cache:
-                if super(TransactionalStore, self).has_blob(store_key):
-                    super(TransactionalStore, self).delete_blob(store_key)
+                if super().has_blob(store_key):
+                    super().delete_blob(store_key)
             for store_key, blob in self._update_cache.items():
-                super(TransactionalStore, self).store_blob(blob, store_key)
+                super().store_blob(blob, store_key)
         finally:
             self._enabled = True
 
     def has_blob(self, key):
         if not self._enabled:
-            return super(TransactionalStore, self).has_blob(key)
+            return super().has_blob(key)
 
         if key in self._delete_cache:
             return False
@@ -88,20 +86,20 @@ class TransactionalStore(Store):
         if key in self._update_cache:
             return True
 
-        return super(TransactionalStore, self).has_blob(key)
+        return super().has_blob(key)
 
     def get_blob(self, key):
         if not self._enabled:
-            return super(TransactionalStore, self).get_blob(key)
+            return super().get_blob(key)
 
         if key in self._update_cache:
             return self._update_cache[key]
 
-        return super(TransactionalStore, self).get_blob(key)
+        return super().get_blob(key)
 
     def store_blob(self, blob, key, *args, **kwargs):
         if not self._enabled:
-            return super(TransactionalStore, self).store_blob(
+            return super().store_blob(
                 blob, key, *args, **kwargs
             )
 
@@ -112,7 +110,7 @@ class TransactionalStore(Store):
 
     def delete_blob(self, key, *args, **kwargs):
         if not self._enabled:
-            return super(TransactionalStore, self).delete_blob(key, *args, **kwargs)
+            return super().delete_blob(key, *args, **kwargs)
 
         if not self.has_blob(key):
             raise KeyError("Key %s not found!" % key)

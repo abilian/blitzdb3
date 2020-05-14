@@ -1,5 +1,4 @@
 """Query operators for the file backend."""
-from __future__ import absolute_import, print_function, unicode_literals
 
 import operator
 import re
@@ -118,7 +117,7 @@ def regex_query(expression):
         return [
             store_key
             for value, store_keys in index.get_index().items()
-            if (isinstance(value, six.string_types) and re.match(pattern, value))
+            if (isinstance(value, str) and re.match(pattern, value))
             for store_key in store_keys
         ]
 
@@ -189,7 +188,7 @@ def compile_query(query):
         for key, value in query.items():
             if key.startswith("$"):
                 if key not in query_funcs:
-                    raise AttributeError("Invalid operator: {}".format(key))
+                    raise AttributeError(f"Invalid operator: {key}")
 
                 expressions.append(query_funcs[key](value))
             else:

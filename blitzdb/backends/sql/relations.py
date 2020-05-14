@@ -1,12 +1,10 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from sqlalchemy.sql import delete, expression, func, select
 from sqlalchemy.sql.expression import and_, text
 
 from .queryset import QuerySet
 
 
-class ManyToManyProxy(object):
+class ManyToManyProxy:
     """The ManyToManyProxy transparently handles n:m relationships among
     different object types. It automatically retrieves related documents from
     the database and initializes them.

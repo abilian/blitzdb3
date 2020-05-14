@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import copy
 from collections import OrderedDict
 
@@ -35,7 +33,7 @@ class QuerySet(BaseQuerySet):
         limit=None,
         offset=None,
     ):
-        super(QuerySet, self).__init__(backend=backend, cls=cls)
+        super().__init__(backend=backend, cls=cls)
 
         self.joins = joins
         self.backend = backend
@@ -120,8 +118,7 @@ class QuerySet(BaseQuerySet):
     def __iter__(self):
         if self.deserialized_objects is None:
             self.get_deserialized_objects()
-        for obj in self.deserialized_objects:
-            yield obj
+        yield from self.deserialized_objects
         # raise StopIteration
 
     def __contains__(self, obj):

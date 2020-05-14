@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from .base import BaseField
 from .binary import BinaryField
 from .boolean import BooleanField

@@ -1,11 +1,9 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from blitzdb.queryset import QuerySet as BaseQuerySet
 
 
 class QuerySet(BaseQuerySet):
     def __init__(self, backend, cls, cursor, raw=False, only=None):
-        super(QuerySet, self).__init__(backend, cls)
+        super().__init__(backend, cls)
         self._cursor = cursor
         self._raw = raw
         self._only = only

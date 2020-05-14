@@ -1,5 +1,4 @@
 """File backend index."""
-from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 from collections import defaultdict
@@ -16,7 +15,7 @@ class NonUnique(BaseException):
     pass
 
 
-class Index(object):
+class Index:
 
     """File backend index.
 
@@ -188,7 +187,7 @@ class Index(object):
             return sorted_keys + missing_keys
 
         else:
-            raise ValueError("Unexpected order value: {:d}".format(order))
+            raise ValueError(f"Unexpected order value: {order:d}")
 
     def save_to_data(self, in_place=False):
         """Save index to data structure.
@@ -284,7 +283,7 @@ class Index(object):
         :type store_key: object
         """
         if self._unique and hash_value in self._index:
-            raise NonUnique("Hash value {} already in index".format(hash_value))
+            raise NonUnique(f"Hash value {hash_value} already in index")
 
         if store_key not in self._index[hash_value]:
             self._index[hash_value].append(store_key)
@@ -351,7 +350,7 @@ class TransactionalIndex(Index):
 
     def __init__(self, *args, **kwargs):
         """Initialize internal state."""
-        super(TransactionalIndex, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._in_transaction = False
 
         self._add_cache = None
@@ -380,11 +379,11 @@ class TransactionalIndex(Index):
 
         for store_key, hash_values in self._add_cache.items():
             for hash_value in hash_values:
-                super(TransactionalIndex, self).add_hashed_value(hash_value, store_key)
+                super().add_hashed_value(hash_value, store_key)
         for store_key in self._remove_cache:
-            super(TransactionalIndex, self).remove_key(store_key)
+            super().remove_key(store_key)
         for store_key in self._undefined_cache:
-            super(TransactionalIndex, self).add_undefined(store_key)
+            super().add_undefined(store_key)
         if not self.ephemeral:
             self.save_to_store()
 
@@ -449,10 +448,10 @@ class TransactionalIndex(Index):
         :rtype: list(str)
         """
         if not include_uncommitted:
-            return super(TransactionalIndex, self).get_keys_for(value)
+            return super().get_keys_for(value)
 
         else:
-            keys = super(TransactionalIndex, self).get_keys_for(value)
+            keys = super().get_keys_for(value)
             hash_value = self.get_hash_for(value)
             keys += self._reverse_add_cache[hash_value]
             return keys

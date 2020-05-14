@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from blitzdb.fields import BaseField
 
 
@@ -13,7 +11,7 @@ class ForeignKeyField(BaseField):
     """
 
     def __init__(self, related, backref=None, ondelete=None, *args, **kwargs):
-        super(ForeignKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.related = related
         self.backref = backref
         self.ondelete = ondelete

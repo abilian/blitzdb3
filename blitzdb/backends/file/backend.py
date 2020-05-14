@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import os
 import os.path
 import uuid
@@ -91,7 +89,7 @@ class Backend(BaseBackend):
         self._auto_transaction = False
         self.begin()
 
-        super(Backend, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def autocommit(self):
@@ -328,7 +326,7 @@ class Backend(BaseBackend):
         return self.index_stores[collection][store_key]
 
     def register(self, cls, parameters=None):
-        if super(Backend, self).register(cls, parameters):
+        if super().register(cls, parameters):
             self.init_indexes(self.get_collection_for_cls(cls))
 
     def get_storage_key_for(self, obj):
@@ -384,7 +382,7 @@ class Backend(BaseBackend):
         if not params_list:
             return
 
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
         else:
             collection = cls_or_collection
@@ -440,7 +438,7 @@ class Backend(BaseBackend):
         store = self.get_collection_store(collection)
         try:
             data = self.deserialize(self.decode_attributes(store.get_blob(key)))
-        except IOError:
+        except OSError:
             raise cls.DoesNotExist
 
         obj = self.create_instance(cls, data)
@@ -518,7 +516,7 @@ class Backend(BaseBackend):
         for store_key in store_keys:
             try:
                 store.delete_blob(store_key)
-            except (KeyError, IOError):
+            except (KeyError, OSError):
                 pass
             for index in indexes.values():
                 index.remove_key(store_key)
@@ -546,7 +544,7 @@ class Backend(BaseBackend):
 
     def sort(self, cls_or_collection, keys, key, order=QuerySet.ASCENDING):
 
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
         else:
@@ -605,7 +603,7 @@ class Backend(BaseBackend):
 
             elif isinstance(q, Document):
                 collection = self.get_collection_for_obj(q)
-                ref = "{}:{}".format(collection, q.pk)
+                ref = f"{collection}:{q.pk}"
                 return ref
 
             else:
@@ -618,7 +616,7 @@ class Backend(BaseBackend):
         if not isinstance(query, dict):
             raise AttributeError("Query parameters must be dict!")
 
-        if not isinstance(cls_or_collection, six.string_types):
+        if not isinstance(cls_or_collection, str):
             collection = self.get_collection_for_cls(cls_or_collection)
             cls = cls_or_collection
         else:
