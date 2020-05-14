@@ -2,7 +2,7 @@
 
 import operator
 import re
-from functools import reduce as reduce
+from functools import reduce
 
 
 def boolean_operator_query(boolean_operator):
