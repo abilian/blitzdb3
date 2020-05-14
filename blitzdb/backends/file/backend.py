@@ -575,9 +575,9 @@ class Backend(BaseBackend):
             _sorted_keys = indexes[sort_key].sort_keys(keys, order)
             return [sort_by_keys(k, sort_keys[1:]) for k in _sorted_keys]
 
-        def flatten(l):
+        def flatten(ll):
             fl = []
-            for elem in l:
+            for elem in ll:
                 if isinstance(elem, list):
                     fl.extend(flatten(elem))
                 else:
